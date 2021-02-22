@@ -1,0 +1,14 @@
+#!/bin/sh
+
+##
+# This script will create a system watcher using inotify which waits for files
+# to be created or moved into the consume folder. If an event is triggered the
+# file extension is checked before being sent to paperless:consume command for
+# import in the app with the appropriate flag to remove the file once consumed.
+
+inotifywait -m /app/storage/consume -e create -e moved_to |
+    while read -r path action file; do
+        if [ "${file##*.}" = 'pdf' ]; then
+            /usr/bin/php /app/artisan paperless:consume "$path$file" --remove-source-file
+        fi
+    done

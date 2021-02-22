@@ -2,46 +2,67 @@
 
 namespace App\Jobs;
 
-use App\Models\Document;
+use App\Models\File;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use Spatie\PdfToImage\Pdf;
+use Imagick;
+use ImagickException;
+use Intervention\Image\ImageManager;
 
 class GenerateThumbnail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Document
+     * @var File
      */
-    private $document;
+    public $file;
 
     /**
      * Create a new job instance.
      *
-     * @param Document $document
+     * @param File $file
      */
-    public function __construct(Document $document)
+    public function __construct(File $file)
     {
-        $this->document = $document;
+        $this->file = $file;
     }
 
     /**
      * Execute the job.
      *
+     * @param ImageManager $manager
      * @return void
-     * @throws \Spatie\PdfToImage\Exceptions\InvalidFormat
-     * @throws \Spatie\PdfToImage\Exceptions\PdfDoesNotExist
+     * @throws ImagickException
      */
-    public function handle()
+    public function handle(ImageManager $manager)
     {
-        $pdf = new Pdf(Storage::disk('media')->path($this->document->attachment));
+        if (! Storage::exists($this->file->path)) {
+            return;
+        }
 
-        $pdf->setCompressionQuality(5)
-            ->saveImage(Storage::disk('media')->path($this->document->thumbnail));
+        $original = $this->file->thumbnail;
+
+        $imagick = new Imagick();
+        $imagick->readImageBlob(Storage::get($this->file->path));
+        $imagick->setIteratorIndex(0);
+
+        $image = $manager->make($imagick)
+            ->fit(32)
+            ->encode('png');
+
+        $path = sprintf('%s/%s.%s', 'thumbnails', md5($image), 'png');
+        $success = Storage::put($path, $image->stream());
+
+        if ($success) {
+            $this->file->thumbnail = $path;
+            $this->file->save();
+
+            Storage::delete($original);
+        }
     }
 }

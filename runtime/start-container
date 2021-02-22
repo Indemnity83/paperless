@@ -1,24 +1,22 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if [ ! -z "$WWWUSER" ]; then
-    usermod -u $WWWUSER sail
+php -v
+
+if [ ! -z "$UID" ]; then
+    usermod -u $UID nobody
+fi
+
+if [ ! -z "$GID" ]; then
+    groupmod -g $GID nobody
+fi
+
+if [ -z "$APP_KEY" ]; then
+    export APP_KEY=`php artisan key:generate --show`
 fi
 
 env > .env
 
-touch /var/www/html/storage/config/database.sqlite
+touch storage/config/database.sqlite
+php artisan migrate --force
 
-if [ -z "$APP_KEY" ]; then
-    echo "APP_KEY=" >> .env
-    php /var/www/html/artisan key:generate --force
-fi
-
-php /var/www/html/artisan config:cache
-php /var/www/html/artisan route:cache
-php /var/www/html/artisan migrate --force
-
-if [ $# -gt 0 ];then
-    exec gosu $WWWUSER "$@"
-else
-    /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
-fi
+/usr/bin/supervisord -c /etc/supervisor.conf

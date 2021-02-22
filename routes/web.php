@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\DocumentController;
-use App\Http\Controllers\DocumentSearchController;
+use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::redirect('/', '/documents');
+Route::redirect('/', '/files');
+Route::resource('/files', FileController::class);
+Route::post('/files/consume', [FileController::class, 'consume'])->name('files.consume');
+Route::get('/files/{file}/download', [FileController::class, 'download']);
+Route::get('/files/{file}/thumbnail', [FileController::class, 'thumbnail']);
 
-Route::middleware(['auth:sanctum', 'verified'])->group(function() {
-    Route::get('/documents/search', DocumentSearchController::class)->name('documents.search');
-    Route::resource('/documents', DocumentController::class);
-});

@@ -1,11 +1,9 @@
 /.git
 /node_modules
 /public/hot
-/public/media
 /public/css/app.css
 /public/js/app.css
 /public/mix-manifest.json
-/runtime/app
 /vendor
 .env
 .env.backup
@@ -21,13 +19,13 @@ yarn-error.log
 !/boostrap/cache/.gitignore
 
 /storage/**
+!/storage/app/.gitignore
 !/storage/config/.gitignore
+!/storage/consume/.gitignore
 !/storage/framework/.gitignore
 !/storage/framework/cache/.gitignore
 !/storage/framework/cache/data/.gitignore
 !/storage/framework/sessions/.gitignore
 !/storage/framework/testing/.gitignore
 !/storage/framework/views/.gitignore
-!/storage/import/.gitignore
-!/storage/media/.gitignore
 !/storage/logs/.gitignore

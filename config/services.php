@@ -30,4 +30,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'pdftotext' => [
+        'path' => env('PDFTOTEXT_PATH', '/usr/bin/pdftotext'),
+    ],
+
+    'pdfinfo' => [
+        'path' => env('PDFINFO_PATH', '/usr/bin/pdfinfo'),
+    ],
+
 ];

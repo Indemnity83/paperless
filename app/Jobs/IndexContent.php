@@ -2,51 +2,56 @@
 
 namespace App\Jobs;
 
-use App\Models\Document;
-use Carbon\Carbon;
+use App\Models\File;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
-use Smalot\PdfParser\Parser;
+use Spatie\PdfToText\Exceptions\CouldNotExtractText;
+use Spatie\PdfToText\Exceptions\PdfNotFound;
+use Spatie\PdfToText\Pdf;
 
 class IndexContent implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Document
+     * @var File
      */
-    private $document;
+    public $file;
 
     /**
      * Create a new job instance.
      *
-     * @param Document $document
+     * @param File $file
      */
-    public function __construct(Document $document)
+    public function __construct(File $file)
     {
-        $this->document = $document;
+        $this->file = $file;
     }
 
     /**
      * Execute the job.
      *
+     * @param Pdf $pdf
      * @return void
      */
-    public function handle()
+    public function handle(Pdf $pdf)
     {
-        // TODO: make a facade for parser so I don't have to new it up and can test it
-        $pdf = (new Parser())->parseFile(Storage::disk('media')->path($this->document->attachment));
+        try {
+            $pdf->setPdf($this->file->getFullPath());
+        } catch (PdfNotFound $e) {
+            // File doesn't exist, don't attempt to run the job again.
+            $this->delete();
 
-        $this->document->content = $pdf->getText();
-        $this->document->pages = count($pdf->getPages());
-        $this->document->details = $pdf->getDetails();
-        $this->document->created_at = Carbon::parse(Arr::get($pdf->getDetails(), 'CreationDate', $this->document->created_at));
-        $this->document->save();
+            return;
+        }
+        try {
+            $this->file->text = $pdf->text();
+            $this->file->save();
+        } catch (CouldNotExtractText $e) {
+            return;
+        }
     }
 }
