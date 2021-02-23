@@ -57,10 +57,13 @@ COPY    runtime/supervisord.conf /etc/supervisor.conf
 COPY    runtime/redis.conf /etc/redis.conf
 COPY    runtime/php.ini /etc/php8/conf.d/custom.ini
 
+# Configure default user account
+RUN     usermod -u 99 -g users nobody
+
 # Copy application
-COPY    --chown=nobody:nobody . /app
-COPY    --chown=nobody:nobody --from=build-vendor /app/vendor /app/vendor
-COPY    --chown=nobody:nobody --from=build-assets /app/public /app/public
+COPY    --chown=nobody:users . /app
+COPY    --chown=nobody:users --from=build-vendor /app/vendor /app/vendor
+COPY    --chown=nobody:users --from=build-assets /app/public /app/public
 
 ENV     APP_ENV=local
 ENV     APP_DEBUG=true
@@ -72,11 +75,10 @@ ENV     CACHE_DRIVER=redis
 ENV     QUEUE_CONNECTION=redis
 ENV     SESSION_DRIVER=redis
 
+EXPOSE  8000
 WORKDIR /app
-
-#EXPOSE 80
-#VOLUME /app/storage/app
-#VOLUME /app/storage/config
-#VOLUME /app/storage/consume
+VOLUME  /app/storage/app
+VOLUME  /app/storage/config
+VOLUME  /app/storage/consume
 
 ENTRYPOINT ["/usr/bin/start-container"]

@@ -1,23 +1,47 @@
 #!/bin/sh
 
-php -v
-
+##
+# By default, the application runs as nobody:users or 99:100 which
+# matches the standard Unraid deployment, but if you need to modify the
+# id of the user, or group pass in the appropriate UID or GID environmental
+# variables and they'll be set here before starting any actual application
+# systems.
 if [ ! -z "$UID" ]; then
     usermod -u $UID nobody
 fi
 
 if [ ! -z "$GID" ]; then
-    groupmod -g $GID nobody
+    groupmod -g $GID users
 fi
 
+##
+# If no APP_KEY was passed from the host, we need to generate
+# one. This key is used for encryption which is generally transient
+# so if this key changes every time we restart the container it
+# will not cause any problems. This key has nothing to do with password
+# hashing.
 if [ -z "$APP_KEY" ]; then
     export APP_KEY=`php artisan key:generate --show`
 fi
 
+##
+# Laravel's environment system doesn't seem to be able to read from system
+# environmental varialbes, so the hack here is to just dump the env out
+# into the .env file that Laravel expects.
 env > .env
 
+
+##
+# Here we setup the application database file, set it with the proper
+# permissions and run any migrations. If the database file already
+# exists, it will simply get touched, so no harm and the migrations
+# are smart enough to skip any already executed migrations. We use
+# --force here only to prevent a confirmation dialog if the application
+# is in 'production' mode.
 touch storage/config/database.sqlite
-chown nobody:nobody storage/config/database.sqlite
+chown nobody:users storage/config/database.sqlite
 php artisan migrate --force
 
+##
+# Finally, we can kick off the application services using supervisor
 /usr/bin/supervisord -c /etc/supervisor.conf
