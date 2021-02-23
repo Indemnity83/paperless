@@ -9,7 +9,6 @@ use App\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -129,20 +128,6 @@ class FileController extends Controller
         return response()->stream(function () use ($file) {
             echo Storage::get($file->thumbnail);
         }, 200, ['Content-Type' => Storage::mimeType($file->thumbnail)]);
-    }
-
-    /**
-     * Download the specified resource.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function consume()
-    {
-        $sources = glob(storage_path('consume/*.pdf'));
-
-        Artisan::call('paperless:consume', ['source' => $sources, '--remove-source-file' => true]);
-
-        return redirect()->route('files.index')->with('status', 'Documents consumed');
     }
 
     /**

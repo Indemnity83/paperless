@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/files');
 Route::resource('/files', FileController::class);
-Route::post('/files/consume', [FileController::class, 'consume'])->name('files.consume');
 Route::get('/files/{file}/download', [FileController::class, 'download']);
 Route::get('/files/{file}/thumbnail', [FileController::class, 'thumbnail']);
 
+Route::view('mockup', 'mockup');

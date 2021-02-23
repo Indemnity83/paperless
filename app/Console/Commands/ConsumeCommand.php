@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Exceptions\ConsoleException;
 use App\Jobs\GenerateThumbnail;
 use App\Jobs\IndexContent;
 use App\Models\File;
@@ -56,13 +55,11 @@ class ConsumeCommand extends Command
             } catch (FileNotFoundException $e) {
                 $this->error($e->getMessage());
                 continue;
-//                throw new ConsoleException($e->getMessage());
             }
 
             if ($source->getMimeType() !== 'application/pdf') {
                 $this->error("The file \"$path\" is not a PDF");
                 continue;
-//                throw new ConsoleException("The file \"$path\" is not a PDF");
             }
 
             $pdf->setPdf($path);
@@ -80,7 +77,6 @@ class ConsumeCommand extends Command
             if ($file->path === false) {
                 $this->error("The file \"$path\" could not be stored");
                 continue;
-//                throw new ConsoleException("The file \"$path\" could not be stored");
             }
 
             $file->save();
