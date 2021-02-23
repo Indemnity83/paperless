@@ -42,11 +42,11 @@ Browse to `http://your-host-ip:8000` to access the Paperless web interface.
 The following table describes data volumes used by the container.  You can set the mappings via the `-v` parameter.  Each mapping follows the following
 format: `<HOST_DIR>:<CONTAINER_DIR>[:PERMISSIONS]`.
 
-| Container path  | Permissions | Description |
-|-----------------|-------------|-------------|
-|`/app/storage/config`| rw | This is where the application stores its databases, indexes, and any files needing persistency. |
-|`/app/storage/consume`| rw | Paperless will monitor this folder for PDF files to ingest into the app. |
-|`/app/storage/data`| rw | This folder contains all the indexed PDF files and thumbnails. |
+| Container path          | Permissions | Description                                                                                     |
+|-------------------------|-------------|-------------------------------------------------------------------------------------------------|
+| `/app/storage/config`   | rw          | This is where the application stores its databases, indexes, and any files needing persistence. |
+| `/app/storage/consume`  | rw          | Paperless will monitor this folder for PDF files to ingest into the app.                        |
+| `/app/storage/data`     | rw          | This folder contains all the indexed PDF files and thumbnails.                                  |
 
 ### Ports
 
@@ -55,19 +55,19 @@ via the `-p` parameter (one per port mapping).  Each mapping follows the
 following format: `<HOST_PORT>:<CONTAINER_PORT>`. You cannot change the port number inside the
 container, but you can use any port on the host side.
 
-| Port | Mapping to host | Description |
-|------|-----------------|-------------|
-| 8000 | Mandatory | Port used to access the web interface of the application. |
+| Port | Mapping to host | Description                                               |
+|------|-----------------|-----------------------------------------------------------|
+| 8000 | Mandatory       | Port used to access the web interface of the application. |
 
 ### Environment Variables
 
 The following environment variables can be passed via the `-e` parameter (one for each variable) to customize the container's properties.  The value
 of this parameter has the format `<VARIABLE_NAME>=<VALUE>`.
 
-| Variable       | Description                                  | Default |
-|----------------|----------------------------------------------|---------|
-|`UID`| ID of the user the application runs as. | `99` |
-|`GID`| ID of the group the application runs as. | `100` |
-|`TZ`| [TimeZone] of the container. | `UTC` |
+| Variable | Description                                  | Default |
+|----------|----------------------------------------------|---------|
+|`UID`     | ID of the user the application runs as.      | `99`    |
+|`GID`     | ID of the group the application runs as.     | `100`   |
+|`TZ`      | [TimeZone] of the container.                 | `UTC`   |
 
 [TimeZone]: https://www.php.net/manual/en/timezones.php
