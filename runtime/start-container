@@ -17,6 +17,7 @@ fi
 env > .env
 
 touch storage/config/database.sqlite
+chown nobody:nobody storage/config/database.sqlite
 php artisan migrate --force
 
 /usr/bin/supervisord -c /etc/supervisor.conf
