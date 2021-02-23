@@ -63,6 +63,8 @@ of this parameter has the format `<VARIABLE_NAME>=<VALUE>`.
 
 | Variable       | Description                                  | Default |
 |----------------|----------------------------------------------|---------|
-|`UID`| ID of the user the application runs as.  See [User/Group IDs](#usergroup-ids) to better understand when this should be set. | `99` |
-|`GID`| ID of the group the application runs as.  See [User/Group IDs](#usergroup-ids) to better understand when this should be set. | `100` |
-|`TZ`| [TimeZone] of the container.  Timezone can also be set by mapping `/etc/localtime` between the host and the container. | `Etc/UTC` |
+|`UID`| ID of the user the application runs as. | `99` |
+|`GID`| ID of the group the application runs as. | `100` |
+|`TZ`| [TimeZone] of the container. | `UTC` |
+
+[TimeZone]: https://www.php.net/manual/en/timezones.php
