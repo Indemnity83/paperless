@@ -4,7 +4,7 @@ services:
   - docker
 
 before_script:
-  - docker build . -t paperless
+  - docker build . --build-args BUILD_ENV=test -t paperless
 
 script:
-  - docker run paperless composer install && vendor/bin/phpunit
+  - docker run paperless vendor/bin/phpunit"

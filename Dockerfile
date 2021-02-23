@@ -1,3 +1,5 @@
+ARG BUILD_ENV=production
+
 ##
 # NPM Install Container
 #
@@ -6,7 +8,10 @@ WORKDIR /app
 COPY    package*.json tailwind.config.js webpack.mix.js ./
 COPY    resources ./resources
 RUN     npm install
-RUN     npm run production
+RUN     if [ "$BUILD_ENV" = "production" ] ; \
+            then npm run production ; \
+            else npm run dev ; \
+        fi
 
 ##
 # Composer Install Container
@@ -14,7 +19,10 @@ RUN     npm run production
 FROM    composer:latest as build-vendor
 WORKDIR /app
 COPY    composer.* ./
-RUN     composer install --prefer-dist --no-scripts --no-dev --no-cache --ignore-platform-reqs
+RUN     if [ "$BUILD_ENV" = "production" ] ; \
+            then composer install --no-cache --ignore-platform-reqs --no-scripts --no-dev ; \
+            else composer install --no-cache --ignore-platform-reqs --no-scripts ; \
+        fi
 
 ##
 # Compile Meilisearch
@@ -23,8 +31,7 @@ FROM    alpine AS build-meilisearch
 RUN     apk --no-cache add curl build-base git
 RUN     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 WORKDIR /meilisearch
-RUN     git clone https://github.com/meilisearch/MeiliSearch.git . && \
-        git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+RUN     git clone -b v0.19.0 --depth 1 https://github.com/meilisearch/MeiliSearch.git .
 ENV     RUSTFLAGS="-C target-feature=-crt-static"
 RUN     $HOME/.cargo/bin/cargo build --release
 
@@ -48,10 +55,6 @@ RUN     ln -s /usr/bin/php8 /usr/bin/php
 # Install meilisearch
 COPY    --from=build-meilisearch /meilisearch/target/release/meilisearch /usr/bin/meilisearch
 
-# Install composer
-RUN     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-        php composer-setup.php --install-dir=/usr/bin --filename=composer && \
-        php -r "unlink('composer-setup.php');"
 
 # Copy system configurations
 COPY    runtime/watch-consume /usr/bin/watch-consume
