@@ -18,5 +18,3 @@ Route::redirect('/', '/files');
 Route::resource('/files', FileController::class);
 Route::get('/files/{file}/download', [FileController::class, 'download']);
 Route::get('/files/{file}/thumbnail', [FileController::class, 'thumbnail']);
-
-Route::view('mockup', 'mockup');
