@@ -26,7 +26,7 @@ docker run -d \
     -p 8000:8000 \
     -v /config:/app/storage/config:rw \
     -v /consume:/app/storage/consume:rw \
-    -v /app:/app/storage/app:rw \
+    -v /data:/app/storage/data:rw \
     indemnity83/paperless
 ```
 
@@ -42,7 +42,7 @@ format: `<HOST_DIR>:<CONTAINER_DIR>[:PERMISSIONS]`.
 |-----------------|-------------|-------------|
 |`/app/storage/config`| rw | This is where the application stores its databases, indexes and any files needing persistency. |
 |`/app/storage/consume`| rw | This folder is watched for PDF files which will be consumed into the app. |
-|`/app/storage/app`| rw | This folder contains all the original PDF files and thumbnails. |
+|`/app/storage/data`| rw | This folder contains all the indexed PDF files and thumbnails. |
 
 ### Ports
 
