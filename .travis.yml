@@ -1,18 +1,10 @@
 language: php
 
-php:
-  - 8.0
-
-os: linux
+services:
+  - docker
 
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source --dev
-  - cp .env.example .env
-  - php artisan key:generate
+  - docker build . -t paperless
 
 script:
-  - vendor/bin/phpunit --coverage-clover coverage.xml
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - docker run paperless composer install && vendor/bin/phpunit
