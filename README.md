@@ -1,12 +1,14 @@
-<p align="center">
+# Paperless
+
+<p align="left">
 <img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/indemnity83/paperless/master?style=flat-square">
 <a href="https://hub.docker.com/r/indemnity83/paperless"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/indemnity83/paperless?style=flat-square"></a>
 <a href="https://github.com/Indemnity83/paperless/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/indemnity83/paperless?style=flat-square"></a>
 </p>
 
-# About Paperless
+<img align="left" src="https://raw.githubusercontent.com/Indemnity83/paperless/master/public/img/app-icon.svg" height="100">
 
-<img align="left" src="https://raw.githubusercontent.com/Indemnity83/paperless/master/public/img/app-icon.svg" height="100"> Paperless is a dockerized Laravel application intended to allow you to scan, index, and archive all of your paper documents digitally.
+Paperless is a dockerized Laravel application intended to allow you to scan, index, and archive all of your paper documents digitally.
 
 The docker container contains everything necessary to keep the application simple, including the webserver, database, process queue, search index, and worker processes. If you don't know what any of that means, then don't worry about it. Just know that Paperless has your back!
 
@@ -14,7 +16,7 @@ The docker container contains everything necessary to keep the application simpl
 @@ Note that this application is still in beta! @@
  
 ! There may be breaking changes. 
-! Always backup of your documents.
+! Always backup your documents.
 ```
 
 ## Quick Start
