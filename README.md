@@ -1,5 +1,3 @@
-<p align="center"><img src="https://raw.githubusercontent.com/Indemnity83/paperless/master/public/img/app-icon.svg" height="100">
-
 <p align="center">
 <img alt="GitHub branch checks state" src="https://img.shields.io/github/checks-status/indemnity83/paperless/master?style=flat-square">
 <a href="https://hub.docker.com/r/indemnity83/paperless"><img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/indemnity83/paperless?style=flat-square"></a>
@@ -8,16 +6,21 @@
 
 # About Paperless
 
-Paperless is a dockerized Laravel application running intended to allow you to scan, index, and archive all of your paper documents digitally.
+<img align="left" src="https://raw.githubusercontent.com/Indemnity83/paperless/master/public/img/app-icon.svg" height="100"> Paperless is a dockerized Laravel application intended to allow you to scan, index, and archive all of your paper documents digitally.
 
-In order to keep the application simple to get up and running, the docker container runs everything necessary including the web server, queue server, search indexer and worker processes. 
+The docker container contains everything necessary to keep the application simple, including the webserver, database, process queue, search index, and worker processes. If you don't know what any of that means, then don't worry about it. Just know that Paperless has your back!
 
-**Note that this application is still in beta, and subject to breaking changes. Proceed with caution before you go burning all your paper documents!**
+```diff
+@@ Note that this application is still in beta! @@
+ 
+! There may be breaking changes. 
+! Always backup of your documents.
+```
 
 ## Quick Start
 
-**NOTE**: The Docker command provided in this quick start is given as an example
-and parameters should be adjusted to your need.
+**NOTE**: The Docker command provided in this quick start is an example
+and you should adjust parameters to your need.
 
 Launch the Paperless docker container with the following command:
 ```
@@ -34,22 +37,21 @@ Browse to `http://your-host-ip:8000` to access the Paperless web interface.
 
 ### Data Volumes
 
-The following table describes data volumes used by the container.  The mappings
-are set via the `-v` parameter.  Each mapping is specified with the following
+The following table describes data volumes used by the container.  You can set the mappings via the `-v` parameter.  Each mapping follows the following
 format: `<HOST_DIR>:<CONTAINER_DIR>[:PERMISSIONS]`.
 
 | Container path  | Permissions | Description |
 |-----------------|-------------|-------------|
-|`/app/storage/config`| rw | This is where the application stores its databases, indexes and any files needing persistency. |
-|`/app/storage/consume`| rw | This folder is watched for PDF files which will be consumed into the app. |
+|`/app/storage/config`| rw | This is where the application stores its databases, indexes, and any files needing persistency. |
+|`/app/storage/consume`| rw | Paperless will monitor this folder for PDF files to ingest into the app. |
 |`/app/storage/data`| rw | This folder contains all the indexed PDF files and thumbnails. |
 
 ### Ports
 
-Here is the list of ports used by the container.  They can be mapped to the host
-via the `-p` parameter (one per port mapping).  Each mapping is defined in the
-following format: `<HOST_PORT>:<CONTAINER_PORT>`.  The port number inside the
-container cannot be changed, but you are free to use any port on the host side.
+Here is the list of ports used by the container.  You can map them to the host
+via the `-p` parameter (one per port mapping).  Each mapping follows the
+following format: `<HOST_PORT>:<CONTAINER_PORT>`. You cannot change the port number inside the
+container, but you can use any port on the host side.
 
 | Port | Mapping to host | Description |
 |------|-----------------|-------------|
@@ -57,8 +59,7 @@ container cannot be changed, but you are free to use any port on the host side.
 
 ### Environment Variables
 
-To customize some properties of the container, the following environment
-variables can be passed via the `-e` parameter (one for each variable).  Value
+The following environment variables can be passed via the `-e` parameter (one for each variable) to customize the container's properties.  The value
 of this parameter has the format `<VARIABLE_NAME>=<VALUE>`.
 
 | Variable       | Description                                  | Default |
