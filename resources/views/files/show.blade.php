@@ -3,9 +3,36 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <title></title>
+
+    <title>Paperless | {{ $file->name }}</title>
+
     <script src="{{ asset('js/app.js') }}" defer></script>
+
+    <!-- Icons -->
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-57x57-precomposed.png" sizes="57x57" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-60x60-precomposed.png" sizes="60x60" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-72x72-precomposed.png" sizes="72x72" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-76x76-precomposed.png" sizes="76x76" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-114x114-precomposed.png" sizes="114x114" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-120x120-precomposed.png" sizes="120x120" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-144x144-precomposed.png" sizes="144x144" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-152x152-precomposed.png" izes="152x152" >
+    <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon-180x180-precomposed.png" sizes="180x180" >
+    <link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16" >
+    <link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32" >
+    <link rel="icon" type="image/png" href="/img/favicon-72x72.png" sizes="72x72" >
+    <link rel="icon" type="image/png" href="/img/favicon-96x96.png" sizes="96x96" >
+    <link rel="icon" type="image/png" href="/img/favicon-128x128.png" sizes="128x128" >
+    <link rel="icon" type="image/png" href="/img/favicon-196x196.png" sizes="196x196" >
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <!-- <link rel='mask-icon' href='safari-pinned-tab.svg' color='#5bbad5'>  you'll have to put your svg here -->
 </head>
 <body class="text-gray-800 font-light">
 <div class="max-w-7xl px-4 mx-auto py-6 h-screen flex flex-col">
@@ -13,19 +40,20 @@
         <div class="flex-1 min-w-0">
             <nav class="flex" aria-label="Breadcrumb">
                 <ol class="flex items-center">
-                    <li>
+                    <li class="flex-none">
                         <div>
-                            <a href="{{ route('files.index') }}" class="text-gray-400 hover:text-gray-500">
-                                <svg class="flex-shrink-0 h-10 w-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-                                </svg>
-                                <span class="sr-only">Home</span>
+                            <a href="{{ route('files.index') }}" class="text-tomato-500 hover:text-tomato-400 flex items-center">
+                                <img src="/img/app-icon.svg" class="h-12 -ml-2 mr-1.5" style="margin-left: -0.5rem;" />
+                                <h3 class="text-3xl leading-6 font-medium hidden md:block">
+                                    Paperless
+                                </h3>
+                                <h3 class="text-3xl leading-6 font-medium md:hidden block mr-2">|</h3>
                             </a>
                         </div>
                     </li>
                     <li>
-                        <div class="flex items-center text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                            <svg class="flex-shrink-0 h-10 w-10 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <div class="flex items-center text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate overflow-hidden overflow-ellipsis">
+                            <svg class="flex-shrink-0 h-10 w-10 text-gray-400 hidden md:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>
                             {{ $file->name }}

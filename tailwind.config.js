@@ -9,14 +9,28 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+        margin: {
+            '-2': '-0.5rem',
+        },
         colors: {
-            cyan: colors.cyan,
+            tomato: {
+                '50':  '#fbf7f2',
+                '100': '#fcefe4',
+                '200': '#f9dac5',
+                '300': '#f7bc92',
+                '400': '#f78e53',
+                '500': '#f7642c',
+                '600': '#ed411c',
+                '700': '#ce311e',
+                '800': '#a52721',
+                '900': '#84211e',
+            },
         }
     },
   },
   variants: {
     extend: {
-        display: ['group-hover']
+        rotate: ['group-hover'],
     },
   },
   plugins: [
