@@ -65,8 +65,8 @@ COPY    --chown=nobody:users . /app
 COPY    --chown=nobody:users --from=build-vendor /app/vendor /app/vendor
 COPY    --chown=nobody:users --from=build-assets /app/public /app/public
 
-ENV     APP_ENV=local
-ENV     APP_DEBUG=true
+ENV     APP_ENV=production
+ENV     APP_DEBUG=false
 ENV     LOG_CHANNEL=stderr
 ENV     SCOUT_DRIVER=meilisearch
 ENV     SCOUT_QUEUE=true
