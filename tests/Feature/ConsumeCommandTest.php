@@ -58,7 +58,7 @@ class ConsumeCommandTest extends TestCase
 
     public function test_remove_source_flag_unlinks_source()
     {
-        $source = tempnam(storage_path('data'), 'TMP_');
+        $source = @tempnam(storage_path('data'), 'TMP_');
         file_put_contents($source, file_get_contents('./tests/Fixtures/sample.pdf'));
 
         $this->assertTrue(file_exists($source));
