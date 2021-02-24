@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GenerateThumbnail;
-use App\Jobs\IndexContent;
 use App\Models\File;
 use App\Pdf;
 use Carbon\Carbon;
@@ -82,9 +80,6 @@ class FileController extends Controller
         throw_if($file->path === false, ValidationException::withMessages(['document' => 'The document could not be stored']));
 
         $file->save();
-
-        GenerateThumbnail::dispatch($file);
-        IndexContent::dispatch($file);
 
         return redirect()->route('files.index')->with('status', 'Document uploaded');
     }

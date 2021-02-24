@@ -2,14 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\GenerateThumbnail;
-use App\Jobs\IndexContent;
+use App\Exceptions\ConsumeCommandException;
 use App\Models\File;
 use App\Pdf;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Illuminate\Support\Str;
 
 class ConsumeCommand extends Command
 {
@@ -42,55 +41,110 @@ class ConsumeCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param Pdf $pdf
-     * @return int
+     * @return void
      */
-    public function handle(Pdf $pdf)
+    public function handle()
     {
         foreach ($this->argument('source') as $path) {
-            $this->info("Consuming: $path");
-
             try {
-                $source = new \Illuminate\Http\File($path);
-            } catch (FileNotFoundException $e) {
+                $this->consume($path);
+            } catch (ConsumeCommandException $e) {
                 $this->error($e->getMessage());
+
+                // Continue handling the command
                 continue;
             }
+        }
+    }
 
-            if ($source->getMimeType() !== 'application/pdf') {
-                $this->error("The file \"$path\" is not a PDF");
-                continue;
-            }
+    /**
+     * Attempt to consume a single file.
+     *
+     * @param string $path
+     * @throws ConsumeCommandException
+     */
+    protected function consume(string $path): void
+    {
+        $this->info("Consuming: $path");
 
-            $pdf->setPdf($path);
-            $year = Carbon::parse($pdf->info('CreationDate', 'now'))->year;
+        $this->validate($path, [
+            'is_file',
+            'mimetypes:application/pdf',
+        ]);
 
-            $file = new File([
-                'name' => $source->getBasename(),
-                'path' => Storage::putFile($year, $source),
-                'bytes' => $source->getSize(),
-                'pages' => $pdf->info('Pages'),
-                'meta' => $pdf->info(),
-                'generated_at' => Carbon::make($pdf->info('CreationDate')),
-            ]);
+        $pdf = app(Pdf::class);
+        $pdf->setPdf($path);
+        $prefix = Carbon::parse($pdf->info('CreationDate', 'now'))->year;
 
-            if ($file->path === false) {
-                $this->error("The file \"$path\" could not be stored");
-                continue;
-            }
+        $file = new File([
+            'name' => basename($path),
+            'path' => Storage::putFile($prefix, $path),
+            'bytes' => filesize($path),
+            'pages' => $pdf->info('Pages'),
+            'meta' => $pdf->info(),
+            'generated_at' => Carbon::make($pdf->info('CreationDate')),
+        ]);
 
-            $file->save();
-
-            if ($this->option('remove-source-file')) {
-                unlink($source);
-            }
-
-            GenerateThumbnail::dispatch($file);
-            IndexContent::dispatch($file);
-
-            $this->info("Consumed: $path");
+        if ($file->path === false) {
+            throw new ConsumeCommandException("The file \"$path\" could not be stored");
         }
 
-        return 0;
+        $file->save();
+
+        if ($this->option('remove-source-file')) {
+            unlink($path);
+        }
+
+        $this->info("Consumed: $path");
+    }
+
+    /**
+     * Run validation rules on the file.
+     *
+     * @param string $path
+     * @param array $rules
+     */
+    protected function validate(string $path, array $rules)
+    {
+        foreach ($rules as $rule) {
+            [$function, $args] = array_pad(explode(':', $rule, 2), 2, null);
+
+            $function = Str::camel("validate_$function");
+            call_user_func([&$this, $function], $path, $args);
+        }
+    }
+
+    /**
+     * The path under validation must be a simple file.
+     *
+     * @param string $path
+     * @param string|null $args
+     * @throws ConsumeCommandException
+     */
+    protected function validateIsFile(string $path, string $args = null)
+    {
+        if (is_file($path)) {
+            return;
+        }
+
+        throw new ConsumeCommandException("The file \"$path\" does not exist");
+    }
+
+    /**
+     * The path under validation must match one of the given MIME types.
+     *
+     * @param string $path
+     * @param string|null $args
+     * @throws ConsumeCommandException
+     */
+    protected function validateMimetypes(string $path, string $args = null)
+    {
+        $mimetypes = explode(',', $args);
+
+        if (in_array(mime_content_type($path), $mimetypes)) {
+            return;
+        }
+
+        throw new ConsumeCommandException("The file \"$path\" is not a PDF");
     }
 }

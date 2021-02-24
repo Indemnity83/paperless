@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\File;
+use App\Observers\FileObserver;
 use App\Pdf as PdfInfo;
 use Illuminate\Support\ServiceProvider;
 use Intervention\Image\ImageManager;
@@ -36,6 +38,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        File::observe(FileObserver::class);
     }
 }
