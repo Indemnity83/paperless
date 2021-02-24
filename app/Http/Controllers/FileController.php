@@ -41,10 +41,6 @@ class FileController extends Controller
             $files->whereIn('id', $ids);
         }
 
-        if (request()->wantsJson()) {
-            return response()->json($files->paginate()->appends($request->query()));
-        }
-
         return response()->view('files.index', [
             'files' => $files->paginate()->appends($request->query()),
         ]);
@@ -56,6 +52,8 @@ class FileController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param \App\Pdf $pdf
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Spatie\PdfToText\Exceptions\PdfNotFound
+     * @throws \Throwable
      */
     public function store(Request $request, Pdf $pdf)
     {
@@ -77,7 +75,9 @@ class FileController extends Controller
             'generated_at' => Carbon::make($pdf->info('CreationDate')),
         ]);
 
-        throw_if($file->path === false, ValidationException::withMessages(['document' => 'The document could not be stored']));
+        throw_if($file->path === false,
+            ValidationException::withMessages(['document' => 'The document could not be stored'])
+        );
 
         $file->save();
 
