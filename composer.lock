@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5017c64dda78a07e42d1b7e4c9950351",
+    "content-hash": "01130f669953d96aaebd383341466a27",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -9048,6 +9048,67 @@
                 }
             ],
             "time": "2020-09-28T06:39:44+00:00"
+        },
+        {
+            "name": "sti3bas/laravel-scout-array-driver",
+            "version": "v2.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Sti3bas/laravel-scout-array-driver.git",
+                "reference": "f6c5addeb512ae32ae53faf5b8e8b55423e567ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Sti3bas/laravel-scout-array-driver/zipball/f6c5addeb512ae32ae53faf5b8e8b55423e567ed",
+                "reference": "f6c5addeb512ae32ae53faf5b8e8b55423e567ed",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^6.0|^7.0|^8.0",
+                "illuminate/support": "^6.0|^7.0|^8.0",
+                "laravel/scout": "8.*",
+                "php": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~1.0",
+                "phpunit/phpunit": "^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sti3bas\\ScoutArray\\ScoutArrayEngineServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sti3bas\\ScoutArray\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Laurynas Geigalas",
+                    "email": "sti3bas@gmail.com"
+                }
+            ],
+            "description": "Array driver for Laravel Scout",
+            "keywords": [
+                "array",
+                "driver",
+                "laravel",
+                "scout",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/Sti3bas/laravel-scout-array-driver/issues",
+                "source": "https://github.com/Sti3bas/laravel-scout-array-driver/tree/v2.2.1"
+            },
+            "time": "2021-02-08T18:31:17+00:00"
         },
         {
             "name": "symfony/debug",

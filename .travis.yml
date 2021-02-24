@@ -1,0 +1,10 @@
+language: php
+
+services:
+  - docker
+
+before_script:
+  - docker build . --build-arg BUILD_ENV=test -t paperless
+
+script:
+  - docker run paperless vendor/bin/phpunit

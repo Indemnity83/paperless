@@ -31,17 +31,25 @@ fi
 env > .env
 
 
-##
-# Here we setup the application database file, set it with the proper
-# permissions and run any migrations. If the database file already
-# exists, it will simply get touched, so no harm and the migrations
-# are smart enough to skip any already executed migrations. We use
-# --force here only to prevent a confirmation dialog if the application
-# is in 'production' mode.
-touch storage/config/database.sqlite
-chown nobody:users storage/config/database.sqlite
-php artisan migrate --force
+if [ $# -gt 0 ];then
+    ##
+    # Execute any commands that were passed into the container
+    su-exec nobody "$@"
 
-##
-# Finally, we can kick off the application services using supervisor
-/usr/bin/supervisord -c /etc/supervisor.conf
+else
+
+    ##
+    # Here we setup the application database file, set it with the proper
+    # permissions and run any migrations. If the database file already
+    # exists, it will simply get touched, so no harm and the migrations
+    # are smart enough to skip any already executed migrations. We use
+    # --force here only to prevent a confirmation dialog if the application
+    # is in 'production' mode.
+    touch storage/config/database.sqlite
+    chown nobody:users storage/config/database.sqlite
+    php artisan migrate --force
+
+    ##
+    # Finally, we can kick off the application services using supervisor
+    /usr/bin/supervisord -c /etc/supervisor.conf
+fi
