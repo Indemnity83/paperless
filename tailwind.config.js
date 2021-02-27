@@ -9,21 +9,25 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
+        fontFamily: {
+            'brand': ['RocknRoll One', 'sans-serif'],
+        },
         margin: {
+            '-1': '-0.25rem',
             '-2': '-0.5rem',
         },
         colors: {
-            tomato: {
-                '50':  '#fbf7f2',
-                '100': '#fcefe4',
-                '200': '#f9dac5',
-                '300': '#f7bc92',
-                '400': '#f78e53',
-                '500': '#f7642c',
-                '600': '#ed411c',
-                '700': '#ce311e',
-                '800': '#a52721',
-                '900': '#84211e',
+            chocolate: {
+                '50':  '#faf5e9',
+                '100': '#fbedcc',
+                '200': '#f8df99',
+                '300': '#f5c756',
+                '400': '#f2a421',
+                '500': '#f17e0e',
+                '600': '#ef5c09',
+                '700': '#c6430e',
+                '800': '#a33515',
+                '900': '#862c16',
             },
         }
     },
