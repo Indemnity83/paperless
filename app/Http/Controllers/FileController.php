@@ -16,6 +16,11 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth:sanctum', 'verified']);
+    }
+
     /**
      * Display a listing of the resource.
      *
