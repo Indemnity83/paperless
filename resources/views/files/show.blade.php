@@ -8,11 +8,11 @@
                     <div class="flex items-center">
                         <div>
                             <div class="flex items-center">
-                                <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
+                                <h1 class="md:ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
                                     {{ $file->name }}
                                 </h1>
                             </div>
-                            <dl class="mt-6 flex flex-col sm:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
+                            <dl class="mt-3 flex flex-col md:ml-3 sm:mt-1 sm:flex-row sm:flex-wrap">
                                 @if($file->generated_at)
                                     <x-header-attribute attribute="Generated" icon="solid/calendar">
                                         <time datetime="{{ $file->generated_at->toW3cString() }}">Created {{ $file->generated_at->diffForHumans() }}</time>
@@ -36,14 +36,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 flex space-x-3 md:mt-0 md:ml-4">
-                    <form class="hidden lg:block" method="post" name="destroy" action="{{ route('files.destroy', $file) }}">
+                <div class="mt-2 md:mt-6 flex space-x-3 md:mt-0 md:ml-4">
+                    <form method="post" name="destroy" action="{{ route('files.destroy', $file) }}">
                         @csrf
                         @method('delete')
                         <button type="submit" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-chocolate-500">
                             Move to Trash
                         </button>
                     </form>
+                </div>
+                <div class="mt-2 md:mt-6 flex space-x-3 md:mt-0 md:ml-4">
+                    <a href="/files/{{ $file->id }}/download" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-chocolate-500">
+                        Download
+                    </a>
                 </div>
             </div>
         </div>

@@ -12,6 +12,10 @@
                                     <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-400 sm:leading-9 sm:truncate">
                                         Search results for<span class="italic font-bold text-gray-800">&nbsp;{{ request('q') }}</span>
                                     </h1>
+                                @elseif(\Arr::get(request()->get('filter'), 'trashed') === 'only')
+                                    <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
+                                        Trashed Files
+                                    </h1>
                                 @else
                                     <h1 class="ml-3 text-2xl font-bold leading-7 text-gray-900 sm:leading-9 sm:truncate">
                                         All Files
@@ -110,7 +114,7 @@
             </div>
 
             @foreach($files as $file)
-                <div class="flex justify-between space-x-8 py-5 border-gray-300 border-b {{ $file->trashed() ? 'bg-red-50 line-through' : '' }}">
+                <div class="flex justify-between space-x-8 py-5 border-gray-300 border-b">
                     <div class="flex-grow whitespace-nowrap overflow-hidden overflow-ellipsis">
                         @if($file->thumbnail)
                             <img class="inline object-cover object-top w-8 h-8 mr-3" src="/files/{{ $file->id }}/thumbnail" />
