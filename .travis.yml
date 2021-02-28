@@ -4,6 +4,7 @@ services:
   - docker
 
 before_script:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build . --build-arg BUILD_ENV=test -t paperless
 
 script:
