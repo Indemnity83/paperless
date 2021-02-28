@@ -29,6 +29,7 @@ class FileController extends Controller
             ->allowedSorts([
                 'name',
                 AllowedSort::field('age', 'generated_at'),
+                AllowedSort::field('updated', 'updated_at'),
                 AllowedSort::field('size', 'bytes'),
                 'pages',
             ])
