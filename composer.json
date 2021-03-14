@@ -25,7 +25,9 @@
         "meilisearch/meilisearch-laravel-scout": "^0.12.4",
         "smalot/pdfparser": "^0.18.1",
         "spatie/laravel-query-builder": "^3.3",
-        "spatie/pdf-to-text": "^1.4"
+        "spatie/pdf-to-text": "^1.4",
+        "staudenmeir/laravel-adjacency-list": "^1.6",
+        "vinkla/hashids": "^9.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",

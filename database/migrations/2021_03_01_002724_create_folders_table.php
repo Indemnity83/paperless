@@ -1,12 +1,10 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class AddDefaultUserAccount extends Migration
+class CreateFoldersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,11 +13,11 @@ class AddDefaultUserAccount extends Migration
      */
     public function up()
     {
-        DB::table('users')->insert([
-            'name' => 'admin',
-            'email' => 'admin@change.me',
-            'password' => bcrypt('password'),
-        ]);
+        Schema::create('folders', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -29,6 +27,6 @@ class AddDefaultUserAccount extends Migration
      */
     public function down()
     {
-       //
+        Schema::dropIfExists('folders');
     }
 }

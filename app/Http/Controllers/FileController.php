@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DirectoryTree;
 use App\Models\File;
 use App\Pdf;
 use Carbon\Carbon;
@@ -9,9 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
-use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileController extends Controller
@@ -29,25 +27,10 @@ class FileController extends Controller
      */
     public function index(Request $request)
     {
-        $files = QueryBuilder::for(File::class)
-            ->defaultSort('name')
-            ->allowedSorts([
-                'name',
-                AllowedSort::field('age', 'generated_at'),
-                AllowedSort::field('size', 'bytes'),
-                'pages',
-            ])
-            ->allowedFilters([
-                AllowedFilter::trashed(),
-            ]);
+        $objectId = $request->get('o', DirectoryTree::isRoot()->firstOrFail()->id);
 
-        if ($request->has('q')) {
-            $ids = File::search($request->get('q'))->get()->pluck('id');
-            $files->whereIn('id', $ids);
-        }
-
-        return response()->view('files.index', [
-            'files' => $files->paginate()->appends($request->query()),
+        return response()->view('files', [
+            'objectId' => $objectId,
         ]);
     }
 
@@ -63,6 +46,7 @@ class FileController extends Controller
     public function store(Request $request, Pdf $pdf)
     {
         $request->validate([
+            'parent_id' => ['required', 'exists:objects,id'],
             'document' => ['file', 'mimetypes:application/pdf'],
         ]);
 
@@ -86,7 +70,11 @@ class FileController extends Controller
 
         $file->save();
 
-        return redirect()->route('files.index')->with('status', 'Document uploaded');
+        $fileTree = DirectoryTree::make(['parent_id' => $request->get('parent_id')]);
+        $fileTree->object()->associate($file);
+        $fileTree->save();
+
+        return redirect()->back();
     }
 
     /**
@@ -97,7 +85,10 @@ class FileController extends Controller
      */
     public function show(File $file)
     {
-        return response()->view('files.show', compact('file'));
+        return response()->view('files.show', [
+            'file' => $file,
+            'ancestors' => $file->directoryTree->ancestorsAndSelf()->breadthFirst()->get(),
+        ]);
     }
 
     /**

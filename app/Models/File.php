@@ -66,19 +66,9 @@ class File extends Model
         });
     }
 
-    /**
-     * @return string
-     */
-    public function getSizeAttribute()
+    public function directoryTree()
     {
-        $bytes = $this->bytes;
-        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-
-        for ($i = 0; $bytes > 1024; $i++) {
-            $bytes /= 1024;
-        }
-
-        return round($bytes, 1).' '.$units[$i];
+        return $this->morphOne(DirectoryTree::class, 'object');
     }
 
     /**

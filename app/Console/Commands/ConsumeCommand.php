@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ConsumeCommandException;
+use App\Models\DirectoryTree;
 use App\Models\File;
 use App\Pdf;
 use Carbon\Carbon;
@@ -89,7 +90,11 @@ class ConsumeCommand extends Command
             throw new ConsumeCommandException("The file \"$path\" could not be stored");
         }
 
-        $file->save();
+        $root = DirectoryTree::whereNull('parent_id')->firstOrFail();
+        $fileTree = DirectoryTree::make(['parent_id' => $root->id]);
+        $file->saveOrFail();
+        $fileTree->object()->associate($file);
+        $fileTree->saveOrFail();
 
         if ($this->option('remove-source-file')) {
             unlink($path);

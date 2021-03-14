@@ -52,6 +52,20 @@
 
     <div class="p-0 md:py-6 lg:py-8">
         <div class="max-w-7xl mx-auto p-0 md:px-6 lg:px-8">
+            <div class="py-2 flex items-center justify-between">
+                <div class="px-4 flex items-center">
+                    @foreach($ancestors as $ancestor)
+                        <a href="{{ route('browse', ['hash' => \Vinkla\Hashids\Facades\Hashids::encode($ancestor->id)]) }}" class="font-bold text-gray-400">{{ $ancestor->object->name }}</a>
+
+                        @if(!$loop->last)
+                            <svg class="text-gray-300 w-5 h-5 mx-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 {{-- TODO: replace "object" with something better, I'm going insane trying to get this to be responsive --}}
                 <object type="application/pdf" data="/files/{{ $file->id }}/download" class="w-full h-full" ></object>
