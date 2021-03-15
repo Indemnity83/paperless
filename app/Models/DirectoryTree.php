@@ -61,7 +61,7 @@ class DirectoryTree extends Model
      * @param string $hash
      * @return Builder
      */
-    public function scopeByHash(Builder $query, string $hash)
+    public function scopeByHash(Builder $query, $hash)
     {
         return $query->whereIn('id', Hashids::decode($hash));
     }

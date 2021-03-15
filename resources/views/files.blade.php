@@ -5,6 +5,6 @@
         </h2>
     </x-slot>
 
-    <livewire:file-browser :objectId="$objectId"/>
+    <livewire:file-browser :hash="$hash"/>
 
 </x-app-layout>

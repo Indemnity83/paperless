@@ -16,7 +16,7 @@ use Livewire\Component;
  */
 class FileBrowser extends Component
 {
-    public $objectId;
+    public $hash;
 
     public $creatingFolder = false;
     public $createFolderState = [
@@ -43,7 +43,7 @@ class FileBrowser extends Component
 
     public function getDirectoryTreeProperty()
     {
-        $directoryTree = DirectoryTree::where('id', $this->objectId)->with([
+        $directoryTree = DirectoryTree::byHash($this->hash)->with([
             'children.object',
             'ancestorsAndSelf.object',
             'children.descendantsAndSelf.object',
@@ -69,6 +69,7 @@ class FileBrowser extends Component
         return DirectoryTree::tree()
             ->depthFirst()
             ->where('object_type', 'folder')
+            ->with('object')
             ->get();
     }
 
@@ -85,7 +86,7 @@ class FileBrowser extends Component
         $this->creatingFolder = false;
         $this->createFolderState = ['name' => ''];
 
-        $this->redirect(route('browse', ['o' => $this->objectId]));
+        $this->redirect(route('browse', ['o' => $this->hash]));
     }
 
     public function updatingRenamingChild($id)

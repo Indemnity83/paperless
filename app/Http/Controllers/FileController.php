@@ -27,10 +27,8 @@ class FileController extends Controller
      */
     public function index(Request $request)
     {
-        $objectId = $request->get('o', DirectoryTree::isRoot()->firstOrFail()->id);
-
         return response()->view('files', [
-            'objectId' => $objectId,
+            'hash' => $request->get('o', DirectoryTree::isRoot()->firstOrFail()->hash),
         ]);
     }
 
