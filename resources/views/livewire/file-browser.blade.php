@@ -1,8 +1,6 @@
 <div class="py-6 sm:py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-
-
         <div class="px-4 pb-5 sm:pr-0 flex items-center justify-between">
             <nav class="flex" aria-label="Breadcrumb">
                 <ol class="flex items-center space-x-1">
@@ -31,11 +29,13 @@
                 </ol>
             </nav>
 
-            <div class="flex items-center space-x-2">
-                @if($this->directoryTree->object_type === 'folder')
+
+            @if($this->directoryTree->object_type === 'folder')
+                <div class="flex items-center space-x-2">
                     <x-jet-secondary-button wire:click="$set('creatingFolder', true)" class="hidden md:inline">
                         New folder
                     </x-jet-secondary-button>
+
                     <form class="hidden md:inline" method="post" action="{{ route('files.store') }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="parent_id" value="{{ $this->directoryTree->id }}" />
@@ -44,43 +44,20 @@
                             <input type="file" class="hidden" name="document" accept="application/pdf" onchange="form.submit()"/>
                         </label>
                     </form>
-                @endif
 
-                @if($this->directoryTree->object_type === 'file')
-                    <x-jet-secondary-button wire:click="$set('deletingChild', {{ $this->directoryTree->id }})" class="hidden md:inline">
-                        Trash
-                    </x-jet-secondary-button>
-                @endif
-                <!-- This example requires Tailwind CSS v2.0+ -->
-                <div class="relative inline-block text-left inline md:hidden" x-data="{ isOpen: false }">
-                    <div>
-                        <button @click="isOpen = !isOpen" type="button" class="-my-2 p-2 flex items-center text-gray-400 hover:text-gray-600" id="menu-1" aria-expanded="false" aria-haspopup="true">
-                            <span class="sr-only">Open options</span>
-                            @if($this->directoryTree->object_type === 'folder')
+                    <x-jet-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex md:hidden items-center p-3 text-sm leading-5 font-medium text-gray-400 hover:text-gray-800">
                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
-                            @else
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                            @endif
-                        </button>
-                    </div>
-                    <div
-                        x-show="isOpen"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
-                        x-transition:leave="transform opacity-100 scale-100"
-                        x-transition:leave-start="opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        class="z-50 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                        <div class="py-1" role="none">
-                            @if($this->directoryTree->object_type === 'folder')
-                                <a href="#" wire:click="$set('creatingFolder', true)" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                    New Folder
-                                </a>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <div class="w-48">
+                                <x-jet-dropdown-link href="#" wire:click="$set('creatingFolder', true)">New Folder</x-jet-dropdown-link>
+
                                 <form method="post" action="{{ route('files.store') }}" enctype="multipart/form-data">
                                     @csrf
                                     <input type="hidden" name="parent_id" value="{{ $this->directoryTree->id }}" />
@@ -89,17 +66,40 @@
                                         <input type="file" class="hidden" name="document" accept="application/pdf" onchange="form.submit()"/>
                                     </label>
                                 </form>
-                            @endif
-                        </div>
-                    </div>
+                            </div>
+                        </x-slot>
+                    </x-jet-dropdown>
                 </div>
+            @endif
 
-            </div>
+            @if($this->directoryTree->object_type === 'file')
+                <div class="flex items-center space-x-2">
+                    <x-jet-secondary-button wire:click="$set('deletingChild', {{ $this->directoryTree->id }})" class="hidden md:inline">
+                        Trash
+                    </x-jet-secondary-button>
+
+                    <x-jet-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button class="inline-flex md:hidden items-center p-3 text-sm leading-5 font-medium text-gray-400 hover:text-gray-800">
+                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                </svg>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <div class="w-48">
+                                <x-jet-dropdown-link href="#" wire:click="$set('deletingChild', {{ $this->directoryTree->id }})">Trash</x-jet-dropdown-link>
+                            </div>
+                        </x-slot>
+                    </x-jet-dropdown>
+                </div>
+            @endif
+
         </div>
 
         <div class="bg-white shadow-xl sm:rounded-lg">
 
-            <!-- This example requires Tailwind CSS v2.0+ -->
             @if($this->directoryTree->object_type === 'folder')
                 <div class="">
                     <div class="flow-root">
@@ -171,45 +171,36 @@
                                             </div>
                                         </a>
                                         <div class="relative inline-block text-right flex items-center" >
+
                                             <button wire:click="$set('renamingChild', {{ $child->id }})" class="hidden md:inline p-3 text-sm font-bold leading-5 text-gray-400 hover:text-gray-600">
                                                 Rename
                                             </button>
+
                                             <button wire:click="$set('movingChild', {{ $child->id }})" class="hidden md:inline p-3 text-sm font-bold leading-5 text-gray-400 hover:text-gray-600">
                                                 Move
-                                                {{ optional($movingChildState)->parent_id  }}
                                             </button>
+
                                             <button wire:click="$set('deletingChild', {{ $child->id }})" class="hidden md:inline p-3 text-sm font-bold leading-5 text-pink-400 hover:text-red-600">
                                                 Trash
                                             </button>
-                                            <div x-data="{ isOpen: false }">
-                                                <button @click="isOpen = !isOpen" class="inline-flex md:hidden items-center p-3 text-sm leading-5 font-medium text-gray-400 hover:text-gray-800">
-                                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                                                    </svg>
-                                                </button>
-                                                <div
-                                                    x-show="isOpen"
-                                                    x-transition:enter="transition ease-out duration-100"
-                                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                                    x-transition:leave="transform opacity-100 scale-100"
-                                                    x-transition:leave-start="opacity-100 scale-100"
-                                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                                    class="z-50 origin-top-right absolute right-0 -mt-1.5 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu"
-                                                >
-                                                    <div class="py-1" role="none">
-                                                        <a href="#" wire:click="$set('renamingChild', {{ $child->id }})" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                                            Rename
-                                                        </a>
-                                                        <a href="#" wire:click="$set('movingChild', {{ $child->id }})" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                                            Move
-                                                        </a>
-                                                        <a href="#" wire:click="$set('deletingChild', {{ $child->id }})" @click="isOpen = false" class="block px-4 py-2 text-sm text-pink-500 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                                            Trash
-                                                        </a>
+
+                                            <x-jet-dropdown align="right" width="48">
+                                                <x-slot name="trigger">
+                                                    <button class="inline-flex md:hidden items-center p-3 text-sm leading-5 font-medium text-gray-400 hover:text-gray-800">
+                                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </x-slot>
+
+                                                <x-slot name="content">
+                                                    <div class="w-48">
+                                                        <x-jet-dropdown-link href="#" wire:click="$set('renamingChild', {{ $child->id }})">Rename</x-jet-dropdown-link>
+                                                        <x-jet-dropdown-link href="#" wire:click="$set('movingChild', {{ $child->id }})">Move</x-jet-dropdown-link>
+                                                        <x-jet-dropdown-link href="#" wire:click="$set('deletingChild', {{ $child->id }})">Trash</x-jet-dropdown-link>
                                                     </div>
-                                                </div>
-                                            </div>
+                                                </x-slot>
+                                            </x-jet-dropdown>
                                         </div>
                                     @endif
                                 </div>
@@ -228,74 +219,74 @@
 
             @if($this->directoryTree->object_type === 'file')
 
-                <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-                <div id="pages" class="divide-y-8 divide-gray-200"></div>
+                    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+                    <div id="pages" class="divide-y-8 divide-gray-200"></div>
 
-                <script id="script">
-                    //
-                    // If absolute URL from the remote server is provided, configure the CORS
-                    // header on that server.
-                    //
-                    var url = '/files/{{ $this->directoryTree->object->id }}/download';
-
-                    //
-                    // Loaded via <script> tag, create shortcut to access PDF.js exports.
-                    //
-                    var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-                    //
-                    // The workerSrc property shall be specified.
-                    //
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-                    var currPage = 1; //Pages are 1-based not 0-based
-                    var numPages = 0;
-                    var pdf = null;
-
-                    //
-                    // Asynchronous download PDF
-                    //
-                    var loadingTask = pdfjsLib.getDocument(url);
-                    loadingTask.promise.then(function(doc) {
-                        pdf = doc;
-                        numPages = doc.numPages;
-                        doc.getPage(1).then( handlePages );
-                    });
-
-                    function handlePages(page) {
-                        var scale = 1.5;
-                        var viewport = page.getViewport({ scale: scale, });
+                    <script id="script">
+                        //
+                        // If absolute URL from the remote server is provided, configure the CORS
+                        // header on that server.
+                        //
+                        var url = '/files/{{ $this->directoryTree->object->id }}/download';
 
                         //
-                        // Prepare canvas using PDF page dimensions
+                        // Loaded via <script> tag, create shortcut to access PDF.js exports.
                         //
-                        var canvas = document.createElement( 'canvas' );
-                        canvas.classList.add('w-full');
-                        // canvas.classList.add('border-b-4');
-                        // canvas.classList.add('border-grey-500');
-                        var context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
+                        var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
                         //
-                        // Render PDF page into canvas context
+                        // The workerSrc property shall be specified.
                         //
-                        var renderContext = {
-                            canvasContext: context,
-                            viewport: viewport,
-                        };
-                        page.render(renderContext);
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
 
-                        panel = document.getElementById('pages')
-                        panel.appendChild( canvas );
+                        var currPage = 1; //Pages are 1-based not 0-based
+                        var numPages = 0;
+                        var pdf = null;
 
-                        currPage++;
-                        if ( pdf !== null && currPage <= numPages )
-                        {
-                            pdf.getPage( currPage ).then( handlePages );
+                        //
+                        // Asynchronous download PDF
+                        //
+                        var loadingTask = pdfjsLib.getDocument(url);
+                        loadingTask.promise.then(function(doc) {
+                            pdf = doc;
+                            numPages = doc.numPages;
+                            doc.getPage(1).then( handlePages );
+                        });
+
+                        function handlePages(page) {
+                            var scale = 1.5;
+                            var viewport = page.getViewport({ scale: scale, });
+
+                            //
+                            // Prepare canvas using PDF page dimensions
+                            //
+                            var canvas = document.createElement( 'canvas' );
+                            canvas.classList.add('w-full');
+                            // canvas.classList.add('border-b-4');
+                            // canvas.classList.add('border-grey-500');
+                            var context = canvas.getContext('2d');
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            //
+                            // Render PDF page into canvas context
+                            //
+                            var renderContext = {
+                                canvasContext: context,
+                                viewport: viewport,
+                            };
+                            page.render(renderContext);
+
+                            panel = document.getElementById('pages')
+                            panel.appendChild( canvas );
+
+                            currPage++;
+                            if ( pdf !== null && currPage <= numPages )
+                            {
+                                pdf.getPage( currPage ).then( handlePages );
+                            }
                         }
-                    }
-                </script>
+                    </script>
 
             @endif
 
