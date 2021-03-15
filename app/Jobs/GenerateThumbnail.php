@@ -52,7 +52,7 @@ class GenerateThumbnail implements ShouldQueue
         $imagick->setIteratorIndex(0);
 
         $image = $manager->make($imagick)
-            ->fit(32)
+            ->fit(300)
             ->encode('png');
 
         $path = sprintf('%s/%s.%s', 'thumbnails', md5($image), 'png');

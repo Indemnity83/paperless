@@ -18,6 +18,6 @@ mix.js('resources/js/app.js', 'public/js')
         require('autoprefixer'),
     ]);
 
-if (mix.inProduction()) {
-    mix.version();
-}
+// if (mix.inProduction()) {
+//     mix.version();
+// }

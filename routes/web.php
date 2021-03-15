@@ -23,11 +23,6 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/browse', [FileController::class, 'index'])->name('browse');
-Route::get('tree', function () {
-    dd(\App\Models\DirectoryTree::tree()
-        ->where('object_type', 'folder')
-        ->with('object')
-        ->depthFirst()
-        ->get());
-});
+Route::middleware(['auth:sanctum', 'verified'])->get('/browse', [
+    FileController::class, 'index',
+])->name('browse');

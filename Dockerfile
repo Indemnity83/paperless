@@ -55,7 +55,6 @@ RUN     ln -s /usr/bin/php8 /usr/bin/php
 # Install meilisearch
 COPY    --from=build-meilisearch /meilisearch/target/release/meilisearch /usr/bin/meilisearch
 
-
 # Copy system configurations
 COPY    runtime/watch-consume /usr/bin/watch-consume
 RUN     chmod +x /usr/bin/watch-consume
@@ -64,6 +63,9 @@ RUN     chmod +x /usr/bin/start-container
 COPY    runtime/supervisord.conf /etc/supervisor.conf
 COPY    runtime/redis.conf /etc/redis.conf
 COPY    runtime/php.ini /etc/php8/conf.d/custom.ini
+
+# Setup the scheduler
+RUN     crontab -l | { cat; echo "* * * * * /usr/bin/php /app/artisan schedule:run"; } | crontab -
 
 # Configure default user account
 RUN     usermod -u 99 -g users nobody

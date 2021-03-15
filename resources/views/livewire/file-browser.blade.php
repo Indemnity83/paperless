@@ -33,7 +33,7 @@
 
             <div class="flex items-center space-x-2">
                 @if($this->directoryTree->object_type === 'folder')
-                    <x-jet-secondary-button wire:click="$set('creatingNewFolder', true)" class="hidden md:inline">
+                    <x-jet-secondary-button wire:click="$set('creatingFolder', true)" class="hidden md:inline">
                         New folder
                     </x-jet-secondary-button>
                     <form class="hidden md:inline" method="post" action="{{ route('files.store') }}" enctype="multipart/form-data">
@@ -47,7 +47,7 @@
                 @endif
 
                 @if($this->directoryTree->object_type === 'file')
-                    <x-jet-secondary-button class="hidden md:inline">
+                    <x-jet-secondary-button wire:click="$set('deletingChild', {{ $this->directoryTree->id }})" class="hidden md:inline">
                         Trash
                     </x-jet-secondary-button>
                 @endif
@@ -78,7 +78,7 @@
                         class="z-50 origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                         <div class="py-1" role="none">
                             @if($this->directoryTree->object_type === 'folder')
-                                <a href="#" wire:click="$set('creatingNewFolder', true)" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                <a href="#" wire:click="$set('creatingFolder', true)" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                                     New Folder
                                 </a>
                                 <form method="post" action="{{ route('files.store') }}" enctype="multipart/form-data">
@@ -97,24 +97,24 @@
             </div>
         </div>
 
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+        <div class="bg-white shadow-xl sm:rounded-lg">
 
             <!-- This example requires Tailwind CSS v2.0+ -->
             @if($this->directoryTree->object_type === 'folder')
                 <div class="">
                     <div class="flow-root">
                         <ul class="divide-y divide-gray-200">
-                            @if($creatingNewFolder)
+                            @if($creatingFolder)
                                 <li class="py-2">
                                     <div class="flex items-center space-x-4 px-4">
                                         <form class="flex items-center flex-grow space-x-2">
-                                            <x-jet-input wire:model="newFolderState.name" type="text" class="w-full" autofocus />
+                                            <x-jet-input wire:model="createFolderState.name" type="text" class="w-full" autofocus />
                                             <x-jet-button wire:click.prevent="createFolder" type="submit">
                                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                 </svg>
                                             </x-jet-button>
-                                            <x-jet-secondary-button wire:click="$set('creatingNewFolder', false)">
+                                            <x-jet-secondary-button wire:click="$set('creatingFolder', false)">
                                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
@@ -124,7 +124,7 @@
                                 </li>
                             @endif
                             @foreach($this->directoryTree->children as $child)
-                            <li class="py-2 hover:bg-gray-50" wire:key="{{ $child->id }}">
+                            <li class="py-2 hover:bg-gray-50" wire:key="{{ $child->path }}">
                                 <div class="flex items-center space-x-4 px-4">
                                     @if($renamingChild === $child->id)
                                         <form class="flex items-center flex-grow space-x-2">
@@ -178,7 +178,7 @@
                                                 Move
                                                 {{ optional($movingChildState)->parent_id  }}
                                             </button>
-                                            <button class="hidden md:inline p-3 text-sm font-bold leading-5 text-pink-400 hover:text-red-600">
+                                            <button wire:click="$set('deletingChild', {{ $child->id }})" class="hidden md:inline p-3 text-sm font-bold leading-5 text-pink-400 hover:text-red-600">
                                                 Trash
                                             </button>
                                             <div x-data="{ isOpen: false }">
@@ -198,14 +198,14 @@
                                                     class="z-50 origin-top-right absolute right-0 -mt-1.5 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="options-menu"
                                                 >
                                                     <div class="py-1" role="none">
-                                                        <a href="#" wire:click="$set('renamingChild', {{ $child->id }})" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                                        <a href="#" wire:click="$set('renamingChild', {{ $child->id }})" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                                                             Rename
                                                         </a>
-                                                        <a href="#" wire:click="$set('movingChild', {{ $child->id }})" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                                        <a href="#" wire:click="$set('movingChild', {{ $child->id }})" @click="isOpen = false" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
                                                             Move
                                                         </a>
-                                                        <a href="#" class="block px-4 py-2 text-sm text-pink-500 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                                            Delete
+                                                        <a href="#" wire:click="$set('deletingChild', {{ $child->id }})" @click="isOpen = false" class="block px-4 py-2 text-sm text-pink-500 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
+                                                            Trash
                                                         </a>
                                                     </div>
                                                 </div>
@@ -227,7 +227,6 @@
             @endif
 
             @if($this->directoryTree->object_type === 'file')
-{{--                <object class="py-2 w-full" type="application/pdf" data="/files/{{ $this->directoryTree->object->id }}/download" ></object>--}}
 
                 <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
                 <div id="pages" class="divide-y-8 divide-gray-200"></div>
@@ -302,14 +301,15 @@
 
             <x-jet-dialog-modal maxWidth="md" wire:model="movingChild">
                 <x-slot name="title">
-                    Move Object
+                    Move {{ $movingChildState['object_type'] }} {{ $movingChildState['name'] }}
                 </x-slot>
 
                 <x-slot name="content">
 
+                    <div class="max-h-full overflow-y-scroll">
                     <nav class="" aria-label="Sidebar">
                         @foreach($this->folders as $folder)
-                            <a href="#"
+                            <a href="#" wire:key="{{ $folder->path }}"
                                 wire:click="$set('movingChildState.parent_id', {{ $folder->id }})"
                                 style="margin-left: {{ $folder->depth * 2 }}rem"
                                 @if($movingChildState['parent_id'] === $folder->id)
@@ -335,6 +335,7 @@
                             </a>
                         @endforeach
                     </nav>
+                    </div>
 
                     <x-jet-input-error for="movingChildState.parent_id" />
                 </x-slot>
@@ -349,6 +350,30 @@
                     </x-jet-button>
                 </x-slot>
             </x-jet-dialog-modal>
+
+            <x-jet-confirmation-modal wire:model="deletingChild">
+                <x-slot name="title">
+                    Delete {{ $deletingChildState['object_type'] }}
+                </x-slot>
+
+                <x-slot name="content">
+                    <p class="mb-3">
+                        Are you sure you want to delete the {{ $deletingChildState['object_type'] }} named "{{ $deletingChildState['name'] }}"?
+                    </p>
+
+                    <x-jet-input-error for="deletingChildState" />
+                </x-slot>
+
+                <x-slot name="footer">
+                    <x-jet-secondary-button wire:click="$set('deletingChild', null)" wire:loading.attr="disabled">
+                        Nevermind
+                    </x-jet-secondary-button>
+
+                    <x-jet-danger-button class="ml-2" wire:click="deleteChild" wire:loading.attr="disabled">
+                        Delete
+                    </x-jet-danger-button>
+                </x-slot>
+            </x-jet-confirmation-modal>
 
         </div>
     </div>

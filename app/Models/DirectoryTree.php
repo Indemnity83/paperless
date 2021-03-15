@@ -32,6 +32,15 @@ class DirectoryTree extends Model
      */
     protected $guarded = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($directoryTree) {
+            $directoryTree->object->delete();
+        });
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */

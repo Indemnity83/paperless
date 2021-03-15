@@ -20,6 +20,7 @@
         "laravel/jetstream": "^2.2",
         "laravel/sanctum": "^2.6",
         "laravel/scout": "^8.6",
+        "laravel/telescope": "^4.4",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.0",
         "meilisearch/meilisearch-laravel-scout": "^0.12.4",

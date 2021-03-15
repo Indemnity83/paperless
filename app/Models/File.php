@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\GenerateThumbnail;
+use App\Jobs\IndexContent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +29,7 @@ class File extends Model
     use HasFactory;
     use Notifiable;
     use Searchable;
-    use SoftDeletes;
+//    use SoftDeletes;
 
     /**
      * The attributes that aren't mass assignable.
@@ -59,10 +61,14 @@ class File extends Model
     {
         parent::boot();
 
+        static::created(function ($file) {
+            GenerateThumbnail::dispatch($file);
+            IndexContent::dispatch($file);
+        });
+
         static::deleted(function ($file) {
-            if ($file->isForceDeleting()) {
-                Storage::delete($file->path);
-            }
+            Storage::delete($file->path);
+            Storage::delete($file->thumbnail);
         });
     }
 

@@ -19,6 +19,14 @@
                     <x-jet-nav-link href="{{ route('browse') }}" :active="request()->routeIs('files.index')">
                         {{ __('All Files') }}
                     </x-jet-nav-link>
+
+                    <x-jet-nav-link href="{{ route('horizon.index') }}">
+                        {{ __('Job Queue') }}
+                    </x-jet-nav-link>
+
+                    <x-jet-nav-link href="{{ route('telescope') }}">
+                        {{ __('Debug') }}
+                    </x-jet-nav-link>
                 </div>
             </div>
 
@@ -148,6 +156,10 @@
 
             <x-jet-responsive-nav-link href="{{ route('browse') }}" :active="request()->routeIs('browse')">
                 {{ __('All Files') }}
+            </x-jet-responsive-nav-link>
+
+            <x-jet-responsive-nav-link href="{{ route('horizon.index') }}">
+                {{ __('Job Queue') }}
             </x-jet-responsive-nav-link>
         </div>
 

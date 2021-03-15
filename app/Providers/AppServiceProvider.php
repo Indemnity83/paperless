@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\File;
 use App\Models\Folder;
-use App\Observers\FileObserver;
 use App\Pdf as PdfInfo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -42,8 +41,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        File::observe(FileObserver::class);
-
         Relation::morphMap([
             'folder' => Folder::class,
             'file' => File::class,

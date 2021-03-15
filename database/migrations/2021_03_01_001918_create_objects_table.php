@@ -19,6 +19,7 @@ class CreateObjectsTable extends Migration
             $table->morphs('object');
             $table->foreignId('parent_id')->nullable()->constrained('objects');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
