@@ -28,8 +28,6 @@ class File extends Model
 {
     use HasFactory;
     use Notifiable;
-    use Searchable;
-//    use SoftDeletes;
 
     /**
      * The attributes that aren't mass assignable.
@@ -45,6 +43,15 @@ class File extends Model
      */
     protected $hidden = [
         'text',
+    ];
+
+    /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = [
+        'object'
     ];
 
     /**
@@ -72,9 +79,9 @@ class File extends Model
         });
     }
 
-    public function directoryTree()
+    public function object()
     {
-        return $this->morphOne(DirectoryTree::class, 'object');
+        return $this->morphOne(Obj::class, 'object');
     }
 
     /**
@@ -104,15 +111,5 @@ class File extends Model
     public function getFullPath()
     {
         return Storage::disk('local')->path($this->path);
-    }
-
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray()
-    {
-        return $this->makeVisible('text')->only('id', 'name', 'text');
     }
 }

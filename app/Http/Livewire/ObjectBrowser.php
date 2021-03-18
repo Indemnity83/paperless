@@ -2,63 +2,83 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\DirectoryTree;
+use App\Models\Obj;
 use App\Models\Folder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 /**
- * @property DirectoryTree directoryTree
+ * @property Obj object
+ * @property Collection results
  * @property Collection ancestors
  * @property Collection folders
  */
-class FileBrowser extends Component
+class ObjectBrowser extends Component
 {
-    public $hash;
+    public $object;
+    public $query;
 
     public $creatingFolder = false;
     public $createFolderState = [
         'name' => '',
     ];
 
-    public $renamingChild = null;
+    public $renamingChild = false;
     public $renamingChildState = [
         'name' => '',
     ];
 
-    public $movingChild = null;
+    public $movingChild = false;
     public $movingChildState = [
         'parent_id' => null,
         'object_type' => null,
         'name' => null,
     ];
 
-    public $deletingChild = null;
+    public $deletingChild = false;
     public $deletingChildState = [
         'object_type' => null,
         'name' => null,
     ];
 
-    public function getDirectoryTreeProperty()
+    public function __construct()
     {
-        $directoryTree = DirectoryTree::byHash($this->hash)->with([
-            'children.object',
-            'ancestorsAndSelf.object',
-            'children.descendantsAndSelf.object',
-        ])->firstOrFail();
+        $this->query = request('q');
+    }
 
-        $directoryTree->children = $directoryTree->children
-            ->sortBy('object.name', SORT_NATURAL)
-            ->sortByDesc('object_type');
+    public function getResultsProperty()
+    {
+        if(strlen($this->query)) {
+            return Obj::search($this->query)->get();
+        }
 
-        return $directoryTree;
+        return Obj::where('parent_id', $this->object->id)
+            ->select(DB::raw('objects.*,
+                CASE
+                    WHEN objects.object_type = "folder" THEN folders.name
+                    WHEN objects.object_type = "file" THEN files.name
+                END as name
+            '))
+            ->leftJoin('folders', function($join) {
+                $join->on('objects.object_id', 'folders.id')
+                    ->where('objects.object_type', 'folder');
+            })
+            ->leftJoin('files', function($join) {
+                $join->on('objects.object_id', 'files.id')
+                    ->where('objects.object_type', 'file');
+            })
+            ->orderBy('object_type', 'DESC')
+            ->orderBy('name', 'ASC')
+            ->with('object')
+            ->paginate(50);
     }
 
     public function getAncestorsProperty()
     {
-        return $this->directoryTree
+        return $this->object
             ->ancestorsAndSelf()
             ->breadthFirst()
             ->get();
@@ -66,7 +86,7 @@ class FileBrowser extends Component
 
     public function getFoldersProperty()
     {
-        return DirectoryTree::tree()
+        return Obj::tree()
             ->depthFirst()
             ->where('object_type', 'folder')
             ->with('object')
@@ -79,14 +99,14 @@ class FileBrowser extends Component
             'createFolderState.name' => ['required', 'max:255'],
         ]);
 
-        $fileTree = DirectoryTree::make(['parent_id' => $this->directoryTree->id]);
+        $fileTree = Obj::make(['parent_id' => $this->object->id]);
         $fileTree->object()->associate(Folder::create($this->createFolderState));
         $fileTree->save();
 
         $this->creatingFolder = false;
         $this->createFolderState = ['name' => ''];
 
-        $this->redirect(route('browse', ['o' => $this->hash]));
+        $this->redirect(route('browse', ['o' => $this->object->hash]));
     }
 
     public function updatingRenamingChild($id)
@@ -97,7 +117,7 @@ class FileBrowser extends Component
             return;
         }
 
-        if ($child = DirectoryTree::find($id)) {
+        if ($child = Obj::find($id)) {
             $this->renamingChildState = [
                 'name' => $child->object->name,
             ];
@@ -110,9 +130,9 @@ class FileBrowser extends Component
             'renamingChildState.name' => ['required', 'max:255'],
         ]);
 
-        DirectoryTree::find($this->renamingChild)->object->update($attributes['renamingChildState']);
+        Obj::find($this->renamingChild)->object->update($attributes['renamingChildState']);
 
-        $this->renamingChild = null;
+        $this->renamingChild = false;
     }
 
     public function updatingMovingChild($id)
@@ -123,7 +143,7 @@ class FileBrowser extends Component
             return;
         }
 
-        if ($child = DirectoryTree::find($id)) {
+        if ($child = Obj::find($id)) {
             $this->movingChildState = [
                 'parent_id' => $child->parent_id,
                 'object_type' => $child->object_type,
@@ -134,7 +154,7 @@ class FileBrowser extends Component
 
     public function moveChild()
     {
-        $child = DirectoryTree::findOrFail($this->movingChild);
+        $child = Obj::findOrFail($this->movingChild);
 
         $attributes = $this->validate([
             'movingChildState.parent_id' => [
@@ -146,7 +166,7 @@ class FileBrowser extends Component
 
         $child->update($attributes['movingChildState']);
 
-        $this->movingChild = null;
+        $this->movingChild = false;
     }
 
     public function updatingDeletingChild($id)
@@ -157,7 +177,7 @@ class FileBrowser extends Component
             return;
         }
 
-        if ($child = DirectoryTree::find($id)) {
+        if ($child = Obj::find($id)) {
             $this->deletingChildState = [
                 'object_type' => $child->object_type,
                 'name' => $child->object->name,
@@ -167,14 +187,14 @@ class FileBrowser extends Component
 
     public function deleteChild()
     {
-        $child = DirectoryTree::findOrFail($this->deletingChild);
+        $child = Obj::findOrFail($this->deletingChild);
 
         throw_if(count($child->children) != 0, ValidationException::withMessages([
             'deletingChildState' => "cannot remove '{$child->object->name}': Folder is not empty.",
         ]));
 
         $child->delete();
-        $this->deletingChild = null;
+        $this->deletingChild = false;
 
         if ($child->object_type === 'file') {
             $this->redirect(route('browse', $child->parent));
@@ -183,6 +203,6 @@ class FileBrowser extends Component
 
     public function render()
     {
-        return view('livewire.file-browser');
+        return view('livewire.object-browser');
     }
 }

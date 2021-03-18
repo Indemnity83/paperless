@@ -48,11 +48,11 @@
 
             <!-- This example requires Tailwind CSS v2.0+ -->
             <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
-                @foreach(\App\Models\File::with('directoryTree')->orderBy('created_at', 'DESC')->take(12)->get() as $file)
+                @foreach(\App\Models\File::with('object')->orderBy('created_at', 'DESC')->take(8)->get() as $file)
                 <li class="col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200">
-                    <a href="{{ route('browse', ['o' => $file->directoryTree->id]) }}" class="group">
-                        <div class="w-full h-48 overflow-hidden border-b border-gray-200">
-                            <img class="w-full object-cover object-top" src="/files/{{ $file->id }}/thumbnail" alt="">
+                    <a href="{{ route('browse', ['o' => $file->object->hash]) }}" class="group">
+                        <div class="border-b border-gray-200">
+                            <img class="object-cover object-top w-full h-48" src="/files/{{ $file->id }}/thumbnail" alt="">
                         </div>
                         <div class="flex-1 flex flex-col p-8">
                             <h3 class="text-gray-900 text-sm font-medium">

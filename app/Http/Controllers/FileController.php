@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DirectoryTree;
+use App\Models\Obj;
 use App\Models\File;
 use App\Pdf;
 use Carbon\Carbon;
@@ -17,19 +17,6 @@ class FileController extends Controller
     public function __construct()
     {
         $this->middleware(['auth:sanctum', 'verified']);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\Response|JsonResponse
-     */
-    public function index(Request $request)
-    {
-        return response()->view('files', [
-            'hash' => $request->get('o', DirectoryTree::isRoot()->firstOrFail()->hash),
-        ]);
     }
 
     /**
@@ -68,25 +55,11 @@ class FileController extends Controller
 
         $file->save();
 
-        $fileTree = DirectoryTree::make(['parent_id' => $request->get('parent_id')]);
+        $fileTree = Obj::make(['parent_id' => $request->get('parent_id')]);
         $fileTree->object()->associate($file);
         $fileTree->save();
 
         return redirect()->back();
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\Response
-     */
-    public function show(File $file)
-    {
-        return response()->view('files.show', [
-            'file' => $file,
-            'ancestors' => $file->directoryTree->ancestorsAndSelf()->breadthFirst()->get(),
-        ]);
     }
 
     /**
@@ -117,18 +90,5 @@ class FileController extends Controller
         return response()->stream(function () use ($file) {
             echo Storage::get($file->thumbnail);
         }, 200, ['Content-Type' => Storage::mimeType($file->thumbnail)]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy(File $file)
-    {
-        $file->delete();
-
-        return redirect()->route('files.index')->with('status', 'Document moved to trash');
     }
 }

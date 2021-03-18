@@ -78,7 +78,7 @@ COPY    --chown=nobody:users --from=build-assets /app/public /app/public
 ENV     APP_ENV=production
 ENV     APP_DEBUG=false
 ENV     LOG_CHANNEL=stderr
-ENV     SCOUT_DRIVER=meilisearch
+ENV     SCOUT_DRIVER=tntsearch
 ENV     SCOUT_QUEUE=true
 ENV     DB_CONNECTION=sqlite
 ENV     CACHE_DRIVER=redis

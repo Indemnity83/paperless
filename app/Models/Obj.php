@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -13,10 +14,11 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property mixed object
  * @property Collection descendants
  */
-class DirectoryTree extends Model
+class Obj extends Model
 {
     use HasFactory;
     use HasRecursiveRelationships;
+    use Searchable;
 
     /**
      * The table associated with the model.
@@ -36,8 +38,8 @@ class DirectoryTree extends Model
     {
         parent::boot();
 
-        static::deleting(function ($directoryTree) {
-            $directoryTree->object->delete();
+        static::deleting(function ($object) {
+            $object->object->delete();
         });
     }
 
@@ -64,5 +66,20 @@ class DirectoryTree extends Model
     public function scopeByHash(Builder $query, $hash)
     {
         return $query->whereIn('id', Hashids::decode($hash));
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return[
+            'id' => $this->id,
+            'name' => $this->object->name,
+            'text' => $this->object->text,
+            'path' => $this->ancestorsAndSelf->pluck('object.name')->reverse()->join('/')
+        ];
     }
 }
