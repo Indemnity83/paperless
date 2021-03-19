@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 /**
  * @property Obj object
@@ -18,6 +19,8 @@ use Livewire\Component;
  */
 class ObjectBrowser extends Component
 {
+    use WithPagination;
+
     public $object;
     public $query;
 
@@ -52,7 +55,7 @@ class ObjectBrowser extends Component
     public function getResultsProperty()
     {
         if(strlen($this->query)) {
-            return Obj::search($this->query)->get();
+            return Obj::search($this->query)->paginate(50);
         }
 
         return Obj::where('parent_id', $this->object->id)

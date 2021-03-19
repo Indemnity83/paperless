@@ -5,7 +5,7 @@
             <nav class="flex items-center justify-between pt-5 md:pt-0" aria-label="Breadcrumb">
                 @if(strlen($query))
                     <div class="flex items-center space-x-1">
-                        Found {{ $this->results->count() }}
+                        Found {{ $this->results->total() }}
                     </div>
                 @else
                     <ol class="flex items-center space-x-1">
@@ -236,7 +236,7 @@
                         </ul>
                     </div>
 
-                    @if($this->results->hasMorePages())
+                    @if($this->results->total() > $this->results->perPage())
                         <div class="p-3">
                             {{ $this->results->links() }}
                         </div>
