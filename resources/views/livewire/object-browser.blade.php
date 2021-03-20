@@ -24,7 +24,7 @@
                                             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                                         </svg>
                                         <a href="{{ route('browse', ['o' => $ancestor->hash]) }}" class="text-sm font-medium text-gray-500 hover:text-gray-700">
-                                            {{ $ancestor->object->name }}
+                                            {{ $ancestor->item->name }}
                                         </a>
                                     @endif
                                 </div>
@@ -64,7 +64,7 @@
             </nav>
             <div>
                 <div class="mt-0 md:ml-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
-                    @if($this->object->object_type === 'folder')
+                    @if($this->object->item_type === 'folder')
                         <button type="button" wire:click="$set('creatingFolder', true)" class="hidden md:block md:flex-grow -ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                             <!-- Heroicon name: solid/sort-ascending -->
 {{--                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">--}}
@@ -119,7 +119,7 @@
         </div>
 
         <div class="bg-white shadow-xl sm:rounded-lg">
-            @if($this->object->object_type === 'folder')
+            @if($this->object->item_type === 'folder')
                 <div>
                     <div class="flow-root">
                         <ul class="divide-y divide-gray-200">
@@ -162,12 +162,12 @@
                                     @else
                                         <a href="{{ route('browse', ['o' => $child->hash]) }}" class="flex flex-grow items-center space-x-4">
                                             <div class="flex-shrink-0">
-                                                @if($child->object_type === 'folder')
+                                                @if($child->item_type === 'folder')
                                                     <svg class="w-8 h-8 text-gray-300"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                                                     </svg>
-                                                @elseif($child->object_type === 'file' && $child->object->thumbnail !== null)
-                                                    <img class="h-8 w-8" src="/files/{{$child->object->id}}/thumbnail" alt="">
+                                                @elseif($child->item_type === 'file' && $child->item->thumbnail !== null)
+                                                    <img class="h-8 w-8" src="/files/{{$child->item->id}}/thumbnail" alt="">
                                                 @else
                                                     <svg class="w-8 h-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -176,7 +176,7 @@
                                             </div>
                                             <div class="flex-1 min-w-0 overflow-hidden overflow-ellipsis">
                                                 <span class="text-sm font-medium text-gray-900 truncate">
-                                                    {{ $child->object->name }}
+                                                    {{ $child->item->name }}
                                                 </span>
                                                 @if(strlen($query))
                                                     <span class="flex space-x-2 text-sm text-gray-500 truncate">
@@ -184,14 +184,14 @@
                                                     </span>
                                                 @else
                                                     <ul class="flex space-x-2 text-sm text-gray-500 truncate">
-                                                        @if($child->object_type == 'file')
+                                                        @if($child->item_type == 'file')
                                                             <li>
-                                                                {{ Str::bytesForHumans($child->object->bytes) }}
+                                                                {{ Str::bytesForHumans($child->item->bytes) }}
                                                             </li>
                                                             <li class="text-gray-300">&bull;</li>
                                                         @endif
                                                         <li>
-                                                            {{ Str::relativePrecisionDate($child->object->created_at) }}
+                                                            {{ Str::relativePrecisionDate($child->item->created_at) }}
                                                         </li>
                                                     </ul>
                                                 @endif
@@ -250,7 +250,7 @@
                 </div>
             @endif
 
-            @if($this->object->object_type === 'file')
+            @if($this->object->item_type === 'file')
                 <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
                 <div id="pdfDocument" class="divide-y-8 divide-gray-200"></div>
 
@@ -260,7 +260,7 @@
                     // If absolute URL from the remote server is provided, configure the CORS
                     // header on that server.
                     //
-                    var url = '/files/{{ $this->object->object->id }}/download';
+                    var url = '/files/{{ $this->object->item->id }}/download';
 
                     //
                     // Loaded via <script> tag, create shortcut to access PDF.js exports.
@@ -323,79 +323,82 @@
             @endif
         </div>
     </div>
+
+    <x-jet-dialog-modal maxWidth="md" wire:model="movingChild">
+        <x-slot name="title">
+            Move {{ $movingChildState['item_type'] }} {{ $movingChildState['name'] }}
+        </x-slot>
+
+        <x-slot name="content">
+
+            <div class="max-h-full overflow-y-scroll">
+                <nav class="" aria-label="Sidebar">
+                    @foreach($this->folders as $folder)
+                        <a href="#" wire:key="folder.{{ $folder->id }}"
+                           wire:click="$set('movingChildState.parent_id', {{ $folder->id }})"
+                           style="margin-left: {{ $folder->depth * 2 }}rem"
+                           @if($movingChildState['parent_id'] === $folder->id)
+                           class="bg-indigo-200 text-gray-900 group flex items-center px-3 py-1.5 text-sm font-medium rounded-md"
+                           @else
+                           class="text-gray-600 hover:bg-indigo-50 hover:text-gray-900 group flex items-center px-3 py-1.5 text-sm font-medium rounded-md"
+                            @endif
+                        >
+                            <svg
+                                @if($movingChildState['parent_id'] === $folder->id)
+                                class="text-gray-500 flex-shrink-0 -ml-1 mr-2 h-6 w-6"
+                                @else
+                                class="text-gray-400 group-hover:text-gray-500 flex-shrink-0 -ml-1 mr-2 h-6 w-6"
+                                @endif
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor" aria-hidden="true"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            </svg>
+                            <span class="truncate">
+                                   {{ $folder->item->name }}
+                                </span>
+                        </a>
+                    @endforeach
+                </nav>
+            </div>
+
+            <x-jet-input-error for="movingChildState.parent_id" />
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$set('movingChild', null)" wire:loading.attr="disabled">
+                Nevermind
+            </x-jet-secondary-button>
+
+            <x-jet-button class="ml-2" wire:click="moveChild" wire:loading.attr="disabled">
+                Move
+            </x-jet-button>
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    <x-jet-confirmation-modal wire:model="deletingChild">
+        <x-slot name="title">
+            Delete {{ $deletingChildState['item_type'] }}
+        </x-slot>
+
+        <x-slot name="content">
+            <p class="mb-3">
+                Are you sure you want to delete the {{ $deletingChildState['item_type'] }} named "{{ $deletingChildState['name'] }}"?
+            </p>
+
+            <x-jet-input-error for="deletingChildState" />
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$set('deletingChild', null)" wire:loading.attr="disabled">
+                Nevermind
+            </x-jet-secondary-button>
+
+            <x-jet-danger-button class="ml-2" wire:click="deleteChild" wire:loading.attr="disabled">
+                Delete
+            </x-jet-danger-button>
+        </x-slot>
+    </x-jet-confirmation-modal>
 </div>
 
-<x-jet-dialog-modal maxWidth="md" wire:model="movingChild">
-    <x-slot name="title">
-        Move {{ $movingChildState['object_type'] }} {{ $movingChildState['name'] }}
-    </x-slot>
 
-    <x-slot name="content">
-
-        <div class="max-h-full overflow-y-scroll">
-            <nav class="" aria-label="Sidebar">
-                @foreach($this->folders as $folder)
-                    <a href="#" wire:key="folder.{{ $folder->id }}"
-                       wire:click="$set('movingChildState.parent_id', {{ $folder->id }})"
-                       style="margin-left: {{ $folder->depth * 2 }}rem"
-                       @if($movingChildState['parent_id'] === $folder->id)
-                       class="bg-indigo-200 text-gray-900 group flex items-center px-3 py-1.5 text-sm font-medium rounded-md"
-                       @else
-                       class="text-gray-600 hover:bg-indigo-50 hover:text-gray-900 group flex items-center px-3 py-1.5 text-sm font-medium rounded-md"
-                        @endif
-                    >
-                        <svg
-                            @if($movingChildState['parent_id'] === $folder->id)
-                            class="text-gray-500 flex-shrink-0 -ml-1 mr-2 h-6 w-6"
-                            @else
-                            class="text-gray-400 group-hover:text-gray-500 flex-shrink-0 -ml-1 mr-2 h-6 w-6"
-                            @endif
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor" aria-hidden="true"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                        </svg>
-                        <span class="truncate">
-                                   {{ $folder->object->name }}
-                                </span>
-                    </a>
-                @endforeach
-            </nav>
-        </div>
-
-        <x-jet-input-error for="movingChildState.parent_id" />
-    </x-slot>
-
-    <x-slot name="footer">
-        <x-jet-secondary-button wire:click="$set('movingChild', null)" wire:loading.attr="disabled">
-            Nevermind
-        </x-jet-secondary-button>
-
-        <x-jet-button class="ml-2" wire:click="moveChild" wire:loading.attr="disabled">
-            Move
-        </x-jet-button>
-    </x-slot>
-</x-jet-dialog-modal>
-<x-jet-confirmation-modal wire:model="deletingChild">
-    <x-slot name="title">
-        Delete {{ $deletingChildState['object_type'] }}
-    </x-slot>
-
-    <x-slot name="content">
-        <p class="mb-3">
-            Are you sure you want to delete the {{ $deletingChildState['object_type'] }} named "{{ $deletingChildState['name'] }}"?
-        </p>
-
-        <x-jet-input-error for="deletingChildState" />
-    </x-slot>
-
-    <x-slot name="footer">
-        <x-jet-secondary-button wire:click="$set('deletingChild', null)" wire:loading.attr="disabled">
-            Nevermind
-        </x-jet-secondary-button>
-
-        <x-jet-danger-button class="ml-2" wire:click="deleteChild" wire:loading.attr="disabled">
-            Delete
-        </x-jet-danger-button>
-    </x-slot>
-</x-jet-confirmation-modal>

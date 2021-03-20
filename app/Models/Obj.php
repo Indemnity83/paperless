@@ -11,7 +11,7 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 use Vinkla\Hashids\Facades\Hashids;
 
 /**
- * @property mixed object
+ * @property File|Folder item
  * @property Collection descendants
  */
 class Obj extends Model
@@ -39,14 +39,14 @@ class Obj extends Model
         parent::boot();
 
         static::deleting(function ($object) {
-            $object->object->delete();
+            $object->item->delete();
         });
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function object()
+    public function item()
     {
         return $this->morphTo();
     }
@@ -77,9 +77,9 @@ class Obj extends Model
     {
         return[
             'id' => $this->id,
-            'name' => $this->object->name,
-            'text' => $this->object->text,
-            'path' => $this->ancestorsAndSelf->pluck('object.name')->reverse()->join('/')
+            'name' => $this->item->name,
+            'text' => $this->item->text,
+            'path' => $this->ancestorsAndSelf->pluck('item.name')->reverse()->join('/')
         ];
     }
 }

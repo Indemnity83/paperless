@@ -37,13 +37,13 @@ class ObjectBrowser extends Component
     public $movingChild = false;
     public $movingChildState = [
         'parent_id' => null,
-        'object_type' => null,
+        'item_type' => null,
         'name' => null,
     ];
 
     public $deletingChild = false;
     public $deletingChildState = [
-        'object_type' => null,
+        'item_type' => null,
         'name' => null,
     ];
 
@@ -61,21 +61,21 @@ class ObjectBrowser extends Component
         return Obj::where('parent_id', $this->object->id)
             ->select(DB::raw('objects.*,
                 CASE
-                    WHEN objects.object_type = "folder" THEN folders.name
-                    WHEN objects.object_type = "file" THEN files.name
+                    WHEN objects.item_type = "folder" THEN folders.name
+                    WHEN objects.item_type = "file" THEN files.name
                 END as name
             '))
             ->leftJoin('folders', function($join) {
-                $join->on('objects.object_id', 'folders.id')
-                    ->where('objects.object_type', 'folder');
+                $join->on('objects.item_id', 'folders.id')
+                    ->where('objects.item_type', 'folder');
             })
             ->leftJoin('files', function($join) {
-                $join->on('objects.object_id', 'files.id')
-                    ->where('objects.object_type', 'file');
+                $join->on('objects.item_id', 'files.id')
+                    ->where('objects.item_type', 'file');
             })
-            ->orderBy('object_type', 'DESC')
+            ->orderBy('item_type', 'DESC')
             ->orderBy('name', 'ASC')
-            ->with('object')
+            ->with('item')
             ->paginate(50);
     }
 
@@ -91,8 +91,8 @@ class ObjectBrowser extends Component
     {
         return Obj::tree()
             ->depthFirst()
-            ->where('object_type', 'folder')
-            ->with('object')
+            ->where('item_type', 'folder')
+            ->with('item')
             ->get();
     }
 
@@ -122,7 +122,7 @@ class ObjectBrowser extends Component
 
         if ($child = Obj::find($id)) {
             $this->renamingChildState = [
-                'name' => $child->object->name,
+                'name' => $child->item->name,
             ];
         }
     }
@@ -149,8 +149,8 @@ class ObjectBrowser extends Component
         if ($child = Obj::find($id)) {
             $this->movingChildState = [
                 'parent_id' => $child->parent_id,
-                'object_type' => $child->object_type,
-                'name' => $child->object->name,
+                'item_type' => $child->item_type,
+                'name' => $child->item->name,
             ];
         }
     }
@@ -182,8 +182,8 @@ class ObjectBrowser extends Component
 
         if ($child = Obj::find($id)) {
             $this->deletingChildState = [
-                'object_type' => $child->object_type,
-                'name' => $child->object->name,
+                'item_type' => $child->item_type,
+                'name' => $child->item->name,
             ];
         }
     }
@@ -193,13 +193,13 @@ class ObjectBrowser extends Component
         $child = Obj::findOrFail($this->deletingChild);
 
         throw_if(count($child->children) != 0, ValidationException::withMessages([
-            'deletingChildState' => "cannot remove '{$child->object->name}': Folder is not empty.",
+            'deletingChildState' => "cannot remove '{$child->item->name}': Folder is not empty.",
         ]));
 
         $child->delete();
         $this->deletingChild = false;
 
-        if ($child->object_type === 'file') {
+        if ($child->item_type === 'file') {
             $this->redirect(route('browse', $child->parent));
         }
     }

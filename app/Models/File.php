@@ -15,6 +15,7 @@ use Laravel\Scout\Searchable;
 
 /**
  * @property int bytes
+ * @property string name
  * @property string size
  * @property string created
  * @property string modified

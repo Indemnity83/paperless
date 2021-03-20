@@ -16,7 +16,7 @@ class CreateObjectsTable extends Migration
     {
         Schema::create('objects', function (Blueprint $table) {
             $table->id();
-            $table->morphs('object');
+            $table->morphs('item');
             $table->foreignId('parent_id')->nullable()->constrained('objects');
             $table->timestamps();
             $table->softDeletes();
