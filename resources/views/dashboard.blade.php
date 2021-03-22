@@ -55,7 +55,7 @@
                             <img class="object-cover object-top w-full h-48" src="/files/{{ $object->item->id }}/thumbnail" alt="">
                         </div>
                         <div class="flex-1 flex flex-col p-8">
-                            <h3 class="text-gray-900 text-sm font-medium">
+                            <h3 class="text-gray-900 text-sm font-medium truncate">
                                 {{ $object->item->name }}
                             </h3>
                             <ul class="flex justify-center space-x-2 text-sm text-gray-500 truncate">
