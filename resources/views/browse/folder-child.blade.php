@@ -83,7 +83,6 @@
             </x-slot>
 
             <x-slot name="content">
-                {{ $movingState['parent_id'] }}
                 <nav class="" aria-label="Sidebar">
                     @foreach($this->folders as $folder)
                         <a href="#" wire:key="folder.{{ $folder['id'] }}" wire:click="$set('movingState.parent_id', {{ $folder['id'] }})" style="margin-left: {{ $folder['depth'] * 2 }}rem" class="text-gray-600 hover:bg-indigo-50 hover:text-gray-900 group flex items-center px-3 py-1.5 text-sm font-medium rounded-md {{ $movingState['parent_id'] === $folder['id'] ? 'bg-gray-100 text-gray-900' : '' }}">
