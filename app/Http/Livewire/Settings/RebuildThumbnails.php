@@ -10,7 +10,7 @@ class RebuildThumbnails extends Component
 {
     public function rebuildAllThumbnails()
     {
-        File::all()->each(function($file) {
+        File::all()->each(function ($file) {
             GenerateThumbnail::dispatch($file);
         });
 

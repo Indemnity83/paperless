@@ -1,11 +1,6 @@
 <?php
 
-use App\Models\Obj;
-use App\Models\File;
-use App\Models\Folder;
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 class CreateDirectoryTree extends Migration
 {
@@ -16,16 +11,31 @@ class CreateDirectoryTree extends Migration
      */
     public function up()
     {
-        // Create the root folder
-        $root = Obj::make(['parent_id' => null]);
-        $root->object()->associate(Folder::create(['name' => 'All Files']));
-        $root->save();
+        DB::table('folders')->insert([
+            'name' => 'All Files',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-        // Bring any existing files under the root folder
-        foreach(File::all() as $file) {
-            $fileTree = Obj::make(['parent_id' => $root->id]);
-            $fileTree->object()->associate($file);
-            $fileTree->save();
+        DB::table('objects')->insert([
+            'item_type' => 'folder',
+            'item_id' => DB::table('folders')->first()->id,
+            'parent_id' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $root_id = DB::table('objects')->first()->id;
+        $files = DB::table('files')->select('id')->get();
+
+        foreach($files as $file) {
+            DB::table('objects')->insert([
+                'item_type' => 'file',
+                'item_id' => $file->id,
+                'parent_id' => $root_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 

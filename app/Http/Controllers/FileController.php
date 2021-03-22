@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Obj;
 use App\Models\File;
+use App\Models\Obj;
 use App\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -56,7 +55,7 @@ class FileController extends Controller
         $file->save();
 
         $fileTree = Obj::make(['parent_id' => $request->get('parent_id')]);
-        $fileTree->object()->associate($file);
+        $fileTree->item()->associate($file);
         $fileTree->save();
 
         return redirect()->back();

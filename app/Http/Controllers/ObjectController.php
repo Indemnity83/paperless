@@ -23,7 +23,7 @@ class ObjectController extends Controller
         $object = $this->object($request->get('o'))
                        ->firstOrFail();
 
-        return response()->view('files', [
+        return response()->view('browse.show', [
             'object' => $object,
         ]);
     }

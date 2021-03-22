@@ -5,6 +5,10 @@
         </h2>
     </x-slot>
 
-    <livewire:object-browser :object="$object"/>
+    <div>
+        <div class="max-w-7xl mx-auto py-0 sm:py-10 sm:px-6 lg:px-8">
+            <livewire:browse.obj :object="$object" />
+        </div>
+    </div>
 
 </x-app-layout>

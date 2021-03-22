@@ -24,17 +24,6 @@ RUN     if [ "$BUILD_ENV" = "production" ] ; \
             else composer install --no-cache --ignore-platform-reqs --no-scripts ; \
         fi
 
-##
-# Compile Meilisearch
-#
-FROM    alpine AS build-meilisearch
-RUN     apk --no-cache add curl build-base git
-RUN     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-WORKDIR /meilisearch
-RUN     git clone -b v0.19.0 --depth 1 https://github.com/meilisearch/MeiliSearch.git .
-ENV     RUSTFLAGS="-C target-feature=-crt-static"
-RUN     $HOME/.cargo/bin/cargo build --release
-
 
 ##
 # Application Container
@@ -47,13 +36,10 @@ RUN     apk --no-cache add supervisor shadow curl redis poppler-utils inotify-to
         php8 php8-fpm php8-json php8-mbstring php8-iconv php8-pcntl php8-posix php8-sodium \
         php8-session php8-xml php8-curl php8-fileinfo php8-gd php8-intl php8-zip php8-redis \
         php8-simplexml php8-pdo php8-sqlite3 php8-pdo_sqlite php8-exif php8-pecl-imagick \
-        php8-dom php8-xmlwriter php8-tokenizer php8-phar php8-openssl php8-pdo_mysql
+        php8-dom php8-xmlwriter php8-tokenizer php8-phar php8-openssl php8-pdo_mysql php8-bcmath
 
 # Link php to php8
 RUN     ln -s /usr/bin/php8 /usr/bin/php
-
-# Install meilisearch
-COPY    --from=build-meilisearch /meilisearch/target/release/meilisearch /usr/bin/meilisearch
 
 # Copy system configurations
 COPY    runtime/watch-consume /usr/bin/watch-consume
@@ -65,7 +51,7 @@ COPY    runtime/redis.conf /etc/redis.conf
 COPY    runtime/php.ini /etc/php8/conf.d/custom.ini
 
 # Setup the scheduler
-RUN     crontab -l | { cat; echo "* * * * * /usr/bin/php /app/artisan schedule:run"; } | crontab -
+RUN     echo "*  *  *  *  *    /usr/bin/php /app/artisan schedule:run" | crontab -
 
 # Configure default user account
 RUN     usermod -u 99 -g users nobody

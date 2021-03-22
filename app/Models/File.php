@@ -7,11 +7,9 @@ use App\Jobs\IndexContent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Scout\Searchable;
 
 /**
  * @property int bytes
@@ -24,6 +22,7 @@ use Laravel\Scout\Searchable;
  * @property string|null text
  * @property string path
  * @property string thumbnail
+ * @property Obj object
  */
 class File extends Model
 {
@@ -52,7 +51,7 @@ class File extends Model
      * @var array
      */
     protected $touches = [
-        'object'
+        'object',
     ];
 
     /**
@@ -82,7 +81,7 @@ class File extends Model
 
     public function object()
     {
-        return $this->morphOne(Obj::class, 'object');
+        return $this->morphOne(Obj::class, 'item');
     }
 
     /**

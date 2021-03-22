@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ConsumeCommandException;
-use App\Models\Obj;
 use App\Models\File;
+use App\Models\Obj;
 use App\Pdf;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -63,6 +63,8 @@ class ConsumeCommand extends Command
      *
      * @param string $path
      * @throws ConsumeCommandException
+     * @throws \Carbon\Exceptions\InvalidFormatException
+     * @throws \Throwable
      */
     protected function consume(string $path): void
     {
