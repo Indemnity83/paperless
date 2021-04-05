@@ -26,7 +26,7 @@ fi
 
 ##
 # Laravel's environment system doesn't seem to be able to read from system
-# environmental varialbes, so the hack here is to just dump the env out
+# environmental variables, so the hack here is to just dump the env out
 # into the .env file that Laravel expects.
 env > .env
 

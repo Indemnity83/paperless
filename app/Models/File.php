@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use App\Jobs\GenerateThumbnail;
+use App\Jobs\IndexContent;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Scout\Searchable;
 
 /**
  * @property int bytes
+ * @property string name
  * @property string size
  * @property string created
  * @property string modified
@@ -21,13 +22,12 @@ use Laravel\Scout\Searchable;
  * @property string|null text
  * @property string path
  * @property string thumbnail
+ * @property Obj object
  */
 class File extends Model
 {
     use HasFactory;
     use Notifiable;
-    use Searchable;
-    use SoftDeletes;
 
     /**
      * The attributes that aren't mass assignable.
@@ -46,6 +46,15 @@ class File extends Model
     ];
 
     /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = [
+        'object',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array
@@ -59,26 +68,20 @@ class File extends Model
     {
         parent::boot();
 
+        static::created(function ($file) {
+            GenerateThumbnail::dispatch($file);
+            IndexContent::dispatch($file);
+        });
+
         static::deleted(function ($file) {
-            if ($file->isForceDeleting()) {
-                Storage::delete($file->path);
-            }
+            Storage::delete($file->path);
+            Storage::delete($file->thumbnail);
         });
     }
 
-    /**
-     * @return string
-     */
-    public function getSizeAttribute()
+    public function object()
     {
-        $bytes = $this->bytes;
-        $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
-
-        for ($i = 0; $bytes > 1024; $i++) {
-            $bytes /= 1024;
-        }
-
-        return round($bytes, 1).' '.$units[$i];
+        return $this->morphOne(Obj::class, 'item');
     }
 
     /**
@@ -108,15 +111,5 @@ class File extends Model
     public function getFullPath()
     {
         return Storage::disk('local')->path($this->path);
-    }
-
-    /**
-     * Get the indexable data array for the model.
-     *
-     * @return array
-     */
-    public function toSearchableArray()
-    {
-        return $this->makeVisible('text')->only('id', 'name', 'text');
     }
 }

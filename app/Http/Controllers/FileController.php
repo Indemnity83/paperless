@@ -2,54 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GenerateThumbnail;
-use App\Jobs\IndexContent;
 use App\Models\File;
+use App\Models\Obj;
 use App\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
-use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\Response|JsonResponse
-     */
-    public function index(Request $request)
+    public function __construct()
     {
-        $files = QueryBuilder::for(File::class)
-            ->defaultSort('name')
-            ->allowedSorts([
-                'name',
-                AllowedSort::field('age', 'generated_at'),
-                AllowedSort::field('size', 'bytes'),
-                'pages',
-            ])
-            ->allowedFilters([
-                AllowedFilter::trashed(),
-            ]);
-
-        if ($request->has('q')) {
-            $ids = File::search($request->get('q'))->get()->pluck('id');
-            $files->whereIn('id', $ids);
-        }
-
-        if (request()->wantsJson()) {
-            return response()->json($files->paginate()->appends($request->query()));
-        }
-
-        return response()->view('files.index', [
-            'files' => $files->paginate()->appends($request->query()),
-        ]);
+        $this->middleware(['auth:sanctum', 'verified']);
     }
 
     /**
@@ -58,10 +24,13 @@ class FileController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param \App\Pdf $pdf
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Spatie\PdfToText\Exceptions\PdfNotFound
+     * @throws \Throwable
      */
     public function store(Request $request, Pdf $pdf)
     {
         $request->validate([
+            'parent_id' => ['required', 'exists:objects,id'],
             'document' => ['file', 'mimetypes:application/pdf'],
         ]);
 
@@ -79,25 +48,17 @@ class FileController extends Controller
             'generated_at' => Carbon::make($pdf->info('CreationDate')),
         ]);
 
-        throw_if($file->path === false, ValidationException::withMessages(['document' => 'The document could not be stored']));
+        throw_if($file->path === false,
+            ValidationException::withMessages(['document' => 'The document could not be stored'])
+        );
 
         $file->save();
 
-        GenerateThumbnail::dispatch($file);
-        IndexContent::dispatch($file);
+        $fileTree = Obj::make(['parent_id' => $request->get('parent_id')]);
+        $fileTree->item()->associate($file);
+        $fileTree->save();
 
-        return redirect()->route('files.index')->with('status', 'Document uploaded');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\Response
-     */
-    public function show(File $file)
-    {
-        return response()->view('files.show', compact('file'));
+        return redirect()->back();
     }
 
     /**
@@ -128,18 +89,5 @@ class FileController extends Controller
         return response()->stream(function () use ($file) {
             echo Storage::get($file->thumbnail);
         }, 200, ['Content-Type' => Storage::mimeType($file->thumbnail)]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\File  $file
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy(File $file)
-    {
-        $file->delete();
-
-        return redirect()->route('files.index')->with('status', 'Document moved to trash');
     }
 }

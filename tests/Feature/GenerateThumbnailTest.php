@@ -19,6 +19,7 @@ class GenerateThumbnailTest extends TestCase
         parent::setUp();
 
         Storage::fake();
+        File::unsetEventDispatcher();
     }
 
     public function test_thumbnail_for_a_pdf()
