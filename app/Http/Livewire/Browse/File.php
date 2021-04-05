@@ -63,7 +63,7 @@ class File extends Component
         $this->object->update($attributes['movingState']);
 
         $this->showMoveModal = false;
-        $this->emitUp('refreshBrowser');
+        $this->render();
     }
 
     /**
