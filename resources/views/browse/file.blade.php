@@ -32,8 +32,7 @@
     </div>
 
     <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-    <div id="pdfDocument" class="divide-y-8 divide-gray-200"></div>
-
+    <div id="pdfDocument" class="divide-y-8 divide-gray-200" wire:ignore></div>
 
     <script id="script">
         //
